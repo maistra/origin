@@ -105,6 +105,8 @@ readonly OS_BINARY_RELEASE_CLIENT_EXTRA=(
 # depending on the distribution of Origin
 function os::build::get_product_vars() {
   export OS_BUILD_LDFLAGS_IMAGE_PREFIX="${OS_IMAGE_PREFIX:-"openshift/origin"}"
+  export OS_BUILD_LDFLAGS_ISTIO_IMAGE_PREFIX="${OS_ISTIO_IMAGE_PREFIX:-"openshiftistio/"}"
+  export OS_BUILD_LDFLAGS_ISTIO_IMAGE_VERSION="${OS_ISTIO_IMAGE_VERSION:-"0.6.0"}"
   export OS_BUILD_LDFLAGS_DEFAULT_IMAGE_STREAMS="${OS_BUILD_LDFLAGS_DEFAULT_IMAGE_STREAMS:-"centos7"}"
   export OS_BUILD_LDFLAGS_FEDERATION_SERVER_IMAGE_NAME="${OS_BUILD_LDFLAGS_FEDERATION_SERVER_IMAGE_NAME:-"${OS_BUILD_LDFLAGS_IMAGE_PREFIX}-federation"}"
   export OS_BUILD_LDFLAGS_FEDERATION_ETCD_IMAGE="${OS_BUILD_LDFLAGS_FEDERATION_ETCD_IMAGE:-"quay.io/coreos/etcd:v3.1.7"}"
@@ -128,6 +130,8 @@ function os::build::ldflags() {
 
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/oc/bootstrap/docker.defaultImageStreams" "${OS_BUILD_LDFLAGS_DEFAULT_IMAGE_STREAMS}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultImagePrefix" "${OS_BUILD_LDFLAGS_IMAGE_PREFIX}"))
+  ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultIstioImagePrefix" "${OS_BUILD_LDFLAGS_ISTIO_IMAGE_PREFIX}"))
+  ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultIstioImageVersion" "${OS_BUILD_LDFLAGS_ISTIO_IMAGE_VERSION}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.majorFromGit" "${OS_GIT_MAJOR}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.minorFromGit" "${OS_GIT_MINOR}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.versionFromGit" "${OS_GIT_VERSION}"))

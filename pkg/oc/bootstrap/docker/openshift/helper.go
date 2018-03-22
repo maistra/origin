@@ -132,6 +132,7 @@ type StartOptions struct {
 	KubeconfigContents       string
 	DockerRoot               string
 	ServiceCatalog           bool
+	MutatingAdmissionWebhook bool
 }
 
 // NewHelper creates a new OpenShift helper
@@ -706,6 +707,16 @@ func (h *Helper) updateConfig(configDir string, opt *StartOptions) error {
 	}
 	cfg.AdmissionConfig.PluginConfig["GenericAdmissionWebhook"] = &configapi.AdmissionPluginConfig{
 		Configuration: &configapi.DefaultAdmissionConfig{},
+	}
+	if opt.MutatingAdmissionWebhook {
+		cfg.AdmissionConfig.PluginConfig["MutatingAdmissionWebhook"] = &configapi.AdmissionPluginConfig{
+			Configuration: &configapi.DefaultAdmissionConfig{},
+		}
+		if cfg.KubernetesMasterConfig.ControllerArguments == nil {
+			cfg.KubernetesMasterConfig.ControllerArguments = configapi.ExtendedArguments{}
+		}
+		cfg.KubernetesMasterConfig.ControllerArguments["cluster-signing-cert-file"] = append(cfg.KubernetesMasterConfig.ControllerArguments["cluster-signing-cert-file"], "ca.crt")
+		cfg.KubernetesMasterConfig.ControllerArguments["cluster-signing-key-file"] = append(cfg.KubernetesMasterConfig.ControllerArguments["cluster-signing-key-file"], "ca.key")
 	}
 
 	if cfg.KubernetesMasterConfig.APIServerArguments == nil {

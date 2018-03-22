@@ -25,6 +25,14 @@ var (
 	// This value should be set duing build via -ldflags.
 	DefaultImagePrefix string
 
+	// DefaultIstioImagePrefix is the default prefix for all istio container image names.
+	// This value should be set duing build via -ldflags.
+	DefaultIstioImagePrefix string
+
+	// DefaultIstioImageVersion is the default tag for all istio container images.
+	// This value should be set duing build via -ldflags.
+	DefaultIstioImageVersion string
+
 	// defaultImageFormat is the default format for container image names used
 	// to run containerized components of the platform
 	defaultImageFormat = DefaultImagePrefix + "-${component}:${version}"

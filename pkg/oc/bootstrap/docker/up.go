@@ -213,6 +213,8 @@ type CommonStartConfig struct {
 	ShouldInstallMetrics        bool
 	ShouldInstallLogging        bool
 	ShouldInstallServiceCatalog bool
+	ShouldInstallIstio          bool
+	ShouldInstallIstioCommunity bool
 	PortForwarding              bool
 
 	Out   io.Writer
@@ -257,6 +259,9 @@ type CommonStartConfig struct {
 	shouldCreateUser     *bool
 
 	containerNetworkErr chan error
+
+	IstioImageVersion                string
+	IstioImagePrefix                 string
 }
 
 func (c *CommonStartConfig) addTask(t task) {
@@ -266,7 +271,7 @@ func (c *CommonStartConfig) addTask(t task) {
 func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.BoolVar(&config.ShouldCreateDockerMachine, "create-machine", false, "Create a Docker machine if one doesn't exist")
 	flags.StringVar(&config.DockerMachine, "docker-machine", "", "Specify the Docker machine to use")
-	flags.StringVar(&config.ImageVersion, "version", "", "Specify the tag for OpenShift images")
+	flags.StringVar(&config.ImageVersion, "version", "v3.9.0", "Specify the tag for OpenShift images")
 	flags.StringVar(&config.Image, "image", variable.DefaultImagePrefix, "Specify the images to use for OpenShift")
 	flags.StringVar(&config.ImageStreams, "image-streams", defaultImageStreams, "Specify which image streams to use, centos7|rhel7")
 	flags.BoolVar(&config.SkipRegistryCheck, "skip-registry-check", false, "Skip Docker daemon registry check")
@@ -283,9 +288,13 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.BoolVar(&config.ShouldInstallMetrics, "metrics", false, "Install metrics (experimental)")
 	flags.BoolVar(&config.ShouldInstallLogging, "logging", false, "Install logging (experimental)")
 	flags.BoolVar(&config.ShouldInstallServiceCatalog, "service-catalog", false, "Install service catalog (experimental).")
+	flags.BoolVar(&config.ShouldInstallIstio, "istio", false, "Install Istio (experimental)")
+	flags.BoolVar(&config.ShouldInstallIstioCommunity, "istio-community", false, "Install Istio Upstream Community Version (experimental)")
 	flags.StringVar(&config.HTTPProxy, "http-proxy", "", "HTTP proxy to use for master and builds")
 	flags.StringVar(&config.HTTPSProxy, "https-proxy", "", "HTTPS proxy to use for master and builds")
 	flags.StringArrayVar(&config.NoProxy, "no-proxy", config.NoProxy, "List of hosts or subnets for which a proxy should not be used")
+	flags.StringVar(&config.IstioImageVersion, "istio-version", variable.DefaultIstioImageVersion, "Specify the tag for Istio images (experimental)")
+	flags.StringVar(&config.IstioImagePrefix, "istio-image-prefix", variable.DefaultIstioImagePrefix, "Specify the image prefix to use for Istio (experimental)")
 }
 
 // Start runs the start tasks ensuring that they are executed in sequence
@@ -486,6 +495,11 @@ func (c *ClientStartConfig) Complete(f *osclientcmd.Factory, cmd *cobra.Command,
 	// Install metrics
 	c.addTask(conditionalTask("Installing metrics", c.InstallMetrics, func() bool {
 		return c.ShouldInstallMetrics && c.ShouldInitializeData()
+	}))
+
+	// Install istio
+	c.addTask(conditionalTask("Installing Istio", c.InstallIstio, func() bool {
+		return (c.ShouldInstallIstio || c.ShouldInstallIstioCommunity) && c.ShouldInitializeData()
 	}))
 
 	// Import default image streams
@@ -963,6 +977,7 @@ func (c *ClientStartConfig) StartOpenShift(out io.Writer) error {
 		NoProxy:                  c.NoProxy,
 		DockerRoot:               dockerRoot,
 		ServiceCatalog:           c.ShouldInstallServiceCatalog,
+		MutatingAdmissionWebhook: c.ShouldInstallIstio || c.ShouldInstallIstioCommunity,
 	}
 	if c.ShouldInstallMetrics {
 		opt.MetricsHost = openshift.MetricsHost(c.RoutingSuffix, c.ServerIP)
@@ -1155,6 +1170,10 @@ func useAnsible(v semver.Version) bool {
 	return v.GTE(openshiftVersion36)
 }
 
+func shouldInstallIstio(v semver.Version) bool {
+	return v.GTE(openshiftVersion39)
+}
+
 // clusterVersionIsCurrent returns whether the cluster version being
 // brought up matches the client binary being used.  This needs to
 // be updated each release.
@@ -1210,6 +1229,32 @@ func (c *ClientStartConfig) InstallMetrics(out io.Writer) error {
 			c.ImageStreams)
 	}
 	return c.OpenShiftHelper().InstallMetrics(f, openshift.MetricsHost(c.RoutingSuffix, c.ServerIP), c.Image, c.ImageVersion)
+}
+
+// InstallIstio will start the installation of the Istio components
+func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
+	f, err := c.Factory()
+	if err != nil {
+		return err
+	}
+	serverVersion, _ := c.OpenShiftHelper().ServerVersion()
+	if shouldInstallIstio(serverVersion) {
+		publicMaster := c.PublicHostname
+		if len(publicMaster) == 0 {
+			publicMaster = c.ServerIP
+		}
+		return c.OpenShiftHelper().InstallIstio(f,
+			serverVersion,
+			c.ServerIP,
+			publicMaster,
+			c.ImageVersion,
+			c.IstioImageVersion,
+			c.IstioImagePrefix,
+			c.HostConfigDir,
+			c.ImageStreams,
+			c.ShouldInstallIstioCommunity)
+	}
+	return errors.NewError("Could not install Istio, you must be running on version 3.9 or later")
 }
 
 // InstallServiceCatalog will start the installation of service catalog components

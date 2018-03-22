@@ -90,6 +90,32 @@ openshift_logging_kibana_hostname={{.KibanaHostName}}
 {{.MasterIP}}
 `
 
+const defaultIstioInventory = `
+[OSEv3:children]
+masters
+nodes
+
+[OSEv3:vars]
+openshift_release={{.OSERelease}}
+
+openshift_deployment_type={{.OSEDeploymentType}}
+
+openshift_istio_image_prefix={{.IstioImagePrefix}}
+openshift_istio_image_version={{.IstioImageVersion}}
+openshift_istio_namespace={{.IstioNamespace}}
+openshift_istio_install_community={{.IstioInstallCommunity}}
+openshift_istio_master_public_url={{.MasterPublicURL}}
+
+[masters]
+{{.MasterIP}} ansible_connection=local
+
+[nodes]
+{{.MasterIP}}
+
+[etcd]
+{{.MasterIP}}
+`
+
 type ansibleLoggingInventoryParams struct {
 	Template            string
 	LoggingImagePrefix  string
@@ -105,6 +131,13 @@ type ansibleMetricsInventoryParams struct {
 	HawkularHostName    string
 }
 
+type ansibleIstioInventoryParams struct {
+	IstioImagePrefix      string
+	IstioImageVersion     string
+	IstioNamespace        string
+	IstioInstallCommunity bool
+}
+
 type ansibleInventoryParams struct {
 	MasterIP          string
 	MasterPublicURL   string
@@ -112,6 +145,7 @@ type ansibleInventoryParams struct {
 	OSEDeploymentType string
 	ansibleLoggingInventoryParams
 	ansibleMetricsInventoryParams
+	ansibleIstioInventoryParams
 }
 
 type ansibleRunner struct {
@@ -137,6 +171,7 @@ func newAnsibleInventoryParams() ansibleInventoryParams {
 	return ansibleInventoryParams{
 		ansibleLoggingInventoryParams: ansibleLoggingInventoryParams{},
 		ansibleMetricsInventoryParams: ansibleMetricsInventoryParams{},
+		ansibleIstioInventoryParams:   ansibleIstioInventoryParams{},
 	}
 }
 
@@ -237,6 +272,10 @@ func (r *ansibleRunner) RunPlaybook(params ansibleInventoryParams, playbook, hos
 		{
 			Name:  "PLAYBOOK_FILE",
 			Value: playbook,
+		},
+		{
+			Name:  "OPTS",
+			Value: "-vvv",
 		},
 	}
 	runAsUser := int64(0)
