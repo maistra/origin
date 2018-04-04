@@ -19,7 +19,7 @@ const (
 )
 
 // InstallIstio checks whether istio is installed and installs it if not already installed
-func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version, serverIP, publicHostname, oseVersion, istioVersion, istioPrefix, hostConfigDir, imageStreams string, installCommunity bool) error {
+func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version, serverIP, publicHostname, oseVersion, istioVersion, istioPrefix, hostConfigDir, imageStreams string, installCommunity, installAuth bool) error {
 	kubeClient, err := f.ClientSet()
 	if err != nil {
 		return errors.NewError("cannot obtain API clients").WithCause(err).WithDetails(h.OriginLog())
@@ -50,6 +50,7 @@ func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version
 	params.IstioImageVersion = istioVersion
 	params.IstioImagePrefix = istioPrefix
 	params.IstioInstallCommunity = installCommunity
+	params.IstioInstallAuth = installAuth
 	params.IstioNamespace = istioNamespace
 
 	runner := newAnsibleRunner(h, kubeClient, securityClient, istioNamespace, imageStreams, "istio")

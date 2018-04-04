@@ -104,6 +104,7 @@ openshift_istio_image_prefix={{.IstioImagePrefix}}
 openshift_istio_image_version={{.IstioImageVersion}}
 openshift_istio_namespace={{.IstioNamespace}}
 openshift_istio_install_community={{.IstioInstallCommunity}}
+openshift_istio_install_auth={{.IstioInstallAuth}}
 openshift_istio_master_public_url={{.MasterPublicURL}}
 
 [masters]
@@ -136,6 +137,7 @@ type ansibleIstioInventoryParams struct {
 	IstioImageVersion     string
 	IstioNamespace        string
 	IstioInstallCommunity bool
+	IstioInstallAuth      bool
 }
 
 type ansibleInventoryParams struct {

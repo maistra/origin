@@ -215,6 +215,7 @@ type CommonStartConfig struct {
 	ShouldInstallServiceCatalog bool
 	ShouldInstallIstio          bool
 	ShouldInstallIstioCommunity bool
+	ShouldInstallIstioAuth      bool
 	PortForwarding              bool
 
 	Out   io.Writer
@@ -289,6 +290,7 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.BoolVar(&config.ShouldInstallLogging, "logging", false, "Install logging (experimental)")
 	flags.BoolVar(&config.ShouldInstallServiceCatalog, "service-catalog", false, "Install service catalog (experimental).")
 	flags.BoolVar(&config.ShouldInstallIstio, "istio", false, "Install Istio (experimental)")
+	flags.BoolVar(&config.ShouldInstallIstioAuth, "istio-auth", false, "Install Istio MUTUAL_TLS authentication (experimental)")
 	flags.BoolVar(&config.ShouldInstallIstioCommunity, "istio-community", false, "Install Istio Upstream Community Version (experimental)")
 	flags.StringVar(&config.HTTPProxy, "http-proxy", "", "HTTP proxy to use for master and builds")
 	flags.StringVar(&config.HTTPSProxy, "https-proxy", "", "HTTPS proxy to use for master and builds")
@@ -1252,7 +1254,8 @@ func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
 			c.IstioImagePrefix,
 			c.HostConfigDir,
 			c.ImageStreams,
-			c.ShouldInstallIstioCommunity)
+			c.ShouldInstallIstioCommunity,
+			c.ShouldInstallIstioAuth)
 	}
 	return errors.NewError("Could not install Istio, you must be running on version 3.9 or later")
 }
