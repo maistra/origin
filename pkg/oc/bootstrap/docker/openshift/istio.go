@@ -7,8 +7,8 @@ import (
 	"github.com/blang/semver"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-//	kapi "k8s.io/kubernetes/pkg/apis/core"
 
+	"github.com/openshift/origin/pkg/cmd/util/variable"
 	"github.com/openshift/origin/pkg/oc/bootstrap/docker/errors"
 	"github.com/openshift/origin/pkg/oc/cli/util/clientcmd"
 )
@@ -42,6 +42,9 @@ func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version
 		return errors.NewError("cannot create istio project").WithCause(err).WithDetails(out.String())
 	}
 
+	if (istioPrefix == variable.DefaultIstioImagePrefix) && (imageStreams != imageStreamCentos) {
+		istioPrefix = "openshift3-istio-tech-preview/"
+	}
 	params := newAnsibleInventoryParams()
 	params.Template = defaultIstioInventory
 	params.MasterIP = serverIP
@@ -55,13 +58,11 @@ func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version
 
 	runner := newAnsibleRunner(h, kubeClient, securityClient, istioNamespace, imageStreams, "istio")
 
-	playbookPrefix := "openshift"
-	if imageStreams == imageStreamCentos {
-		playbookPrefix = "origin"
-	}
+	// Change this back once we have the productised installer
+	playbookPrefix := "openshiftistio/origin"
 
-	fmt.Fprintf(out, "Initialising Istio  using %s:%s ...\n", fmt.Sprintf("%s%s", istioPrefix, playbookPrefix), istioVersion)
+	fmt.Fprintf(out, "Initialising Istio  using %s:%s ...\n", playbookPrefix, istioVersion)
 
 	//run istio playbook
-	return runner.RunPlaybook(params, istioPlaybook, hostConfigDir, fmt.Sprintf("%s%s", istioPrefix, playbookPrefix), istioVersion)
+	return runner.RunPlaybook(params, istioPlaybook, hostConfigDir, playbookPrefix, istioVersion)
 }
