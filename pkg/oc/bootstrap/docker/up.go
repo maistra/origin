@@ -263,6 +263,7 @@ type CommonStartConfig struct {
 
 	IstioImageVersion                string
 	IstioImagePrefix                 string
+	IstioJaegerImageVersion          string
 }
 
 func (c *CommonStartConfig) addTask(t task) {
@@ -297,6 +298,7 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.StringArrayVar(&config.NoProxy, "no-proxy", config.NoProxy, "List of hosts or subnets for which a proxy should not be used")
 	flags.StringVar(&config.IstioImageVersion, "istio-version", variable.DefaultIstioImageVersion, "Specify the tag for Istio images (experimental)")
 	flags.StringVar(&config.IstioImagePrefix, "istio-image-prefix", variable.DefaultIstioImagePrefix, "Specify the image prefix to use for Istio (experimental)")
+	flags.StringVar(&config.IstioJaegerImageVersion, "istio-jaeger-version", variable.DefaultIstioJaegerImageVersion, "Specify the tag for Istio Jaeger images (experimental)")
 }
 
 // Start runs the start tasks ensuring that they are executed in sequence
@@ -1252,6 +1254,7 @@ func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
 			c.ImageVersion,
 			c.IstioImageVersion,
 			c.IstioImagePrefix,
+			c.IstioJaegerImageVersion,
 			c.HostConfigDir,
 			c.ImageStreams,
 			c.ShouldInstallIstioCommunity,
