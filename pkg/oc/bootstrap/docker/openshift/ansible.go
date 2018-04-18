@@ -112,6 +112,8 @@ openshift_istio_jaeger_image_version={{.IstioJaegerImageVersion}}
 {{with .LauncherOpenShiftPassword}}launcher_openshift_pwd={{.}}{{end}}
 {{with .LauncherGitHubUsername}}launcher_github_username={{.}}{{end}}
 {{with .LauncherGitHubToken}}launcher_github_token={{.}}{{end}}
+{{with .LauncherCatalogGitRepo}}launcher_catalog_git_repo={{.}}{{end}}
+{{with .LauncherCatalogGitBranch}}launcher_catalog_git_branch={{.}}{{end}}
 
 [masters]
 {{.MasterIP}} ansible_connection=local
@@ -149,7 +151,9 @@ type ansibleIstioInventoryParams struct {
 	LauncherOpenShiftUser     string
 	LauncherOpenShiftPassword string
 	LauncherGitHubUsername    string
-	LauncherGitHubToken        string
+	LauncherGitHubToken       string
+	LauncherCatalogGitRepo    string
+	LauncherCatalogGitBranch  string
 }
 
 type ansibleInventoryParams struct {

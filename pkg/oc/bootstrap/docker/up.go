@@ -270,6 +270,8 @@ type CommonStartConfig struct {
 	LauncherOpenShiftPassword        string
 	LauncherGitHubUsername           string
 	LauncherGitHubToken              string
+	LauncherCatalogGitRepo           string
+	LauncherCatalogGitBranch         string
 }
 
 func (c *CommonStartConfig) addTask(t task) {
@@ -310,6 +312,8 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.StringVar(&config.LauncherOpenShiftPassword, "launcher-openshift-password", "", "OpenShift password for Launcher (experimental)")
 	flags.StringVar(&config.LauncherGitHubUsername, "launcher-github-username", "", "GitHub username for Launcher (experimental)")
 	flags.StringVar(&config.LauncherGitHubToken, "launcher-github-token", "", "GitHub token for Launcher (experimental)")
+	flags.StringVar(&config.LauncherCatalogGitRepo, "launcher-catalog-git-repo", "", "GitHub repository for the Launcher catalog (experimental)")
+	flags.StringVar(&config.LauncherCatalogGitBranch, "launcher-catalog-git-branch", "", "GitHub branch for the Launcher catalog (experimental)")
 }
 
 // Start runs the start tasks ensuring that they are executed in sequence
@@ -1274,7 +1278,9 @@ func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
 			c.LauncherOpenShiftUser,
 			c.LauncherOpenShiftPassword,
 			c.LauncherGitHubUsername,
-			c.LauncherGitHubToken)
+			c.LauncherGitHubToken,
+			c.LauncherCatalogGitRepo,
+			c.LauncherCatalogGitBranch)
 	}
 	return errors.NewError("Could not install Istio, you must be running on version 3.9 or later")
 }

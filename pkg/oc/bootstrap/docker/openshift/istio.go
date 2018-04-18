@@ -20,7 +20,7 @@ const (
 
 // InstallIstio checks whether istio is installed and installs it if not already installed
 func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version, serverIP, publicHostname, oseVersion, istioVersion, istioPrefix, istioJaegerVersion, hostConfigDir, imageStreams string,
-	installCommunity, installAuth, installLauncher bool, launcherOpenShiftUser, launcherOpenShiftPassword, launcherGitHubUsername, launcherGitHubToken string) error {
+	installCommunity, installAuth, installLauncher bool, launcherOpenShiftUser, launcherOpenShiftPassword, launcherGitHubUsername, launcherGitHubToken, launcherCatalogGitRepo, launcherCatalogGitBranch string) error {
 	kubeClient, err := f.ClientSet()
 	if err != nil {
 		return errors.NewError("cannot obtain API clients").WithCause(err).WithDetails(h.OriginLog())
@@ -62,6 +62,8 @@ func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version
 	params.LauncherOpenShiftPassword = launcherOpenShiftPassword
 	params.LauncherGitHubUsername = launcherGitHubUsername
 	params.LauncherGitHubToken = launcherGitHubToken
+	params.LauncherCatalogGitRepo = launcherCatalogGitRepo
+	params.LauncherCatalogGitBranch = launcherCatalogGitBranch
 
 	runner := newAnsibleRunner(h, kubeClient, securityClient, istioNamespace, imageStreams, "istio")
 
