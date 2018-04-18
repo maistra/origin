@@ -216,6 +216,7 @@ type CommonStartConfig struct {
 	ShouldInstallIstio          bool
 	ShouldInstallIstioCommunity bool
 	ShouldInstallIstioAuth      bool
+	ShouldInstallLauncher       bool
 	PortForwarding              bool
 
 	Out   io.Writer
@@ -264,6 +265,11 @@ type CommonStartConfig struct {
 	IstioImageVersion                string
 	IstioImagePrefix                 string
 	IstioJaegerImageVersion          string
+
+	LauncherOpenShiftUser            string
+	LauncherOpenShiftPassword        string
+	LauncherGitHubUsername           string
+	LauncherGitHubToken              string
 }
 
 func (c *CommonStartConfig) addTask(t task) {
@@ -299,6 +305,11 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.StringVar(&config.IstioImageVersion, "istio-version", variable.DefaultIstioImageVersion, "Specify the tag for Istio images (experimental)")
 	flags.StringVar(&config.IstioImagePrefix, "istio-image-prefix", variable.DefaultIstioImagePrefix, "Specify the image prefix to use for Istio (experimental)")
 	flags.StringVar(&config.IstioJaegerImageVersion, "istio-jaeger-version", variable.DefaultIstioJaegerImageVersion, "Specify the tag for Istio Jaeger images (experimental)")
+	flags.BoolVar(&config.ShouldInstallLauncher, "launcher", false, "Install Launcher for RHOAR Boosters (experimental)")
+	flags.StringVar(&config.LauncherOpenShiftUser, "launcher-openshift-user", "", "OpenShift user for Launcher (experimental)")
+	flags.StringVar(&config.LauncherOpenShiftPassword, "launcher-openshift-password", "", "OpenShift password for Launcher (experimental)")
+	flags.StringVar(&config.LauncherGitHubUsername, "launcher-openshift-username", "", "GitHub username for Launcher (experimental)")
+	flags.StringVar(&config.LauncherGitHubToken, "launcher-openshift-token", "", "GitHub token for Launcher (experimental)")
 }
 
 // Start runs the start tasks ensuring that they are executed in sequence
@@ -1258,7 +1269,12 @@ func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
 			c.HostConfigDir,
 			c.ImageStreams,
 			c.ShouldInstallIstioCommunity,
-			c.ShouldInstallIstioAuth)
+			c.ShouldInstallIstioAuth,
+			c.ShouldInstallLauncher,
+			c.LauncherOpenShiftUser,
+			c.LauncherOpenShiftPassword,
+			c.LauncherGitHubUsername,
+			c.LauncherGitHubToken)
 	}
 	return errors.NewError("Could not install Istio, you must be running on version 3.9 or later")
 }
