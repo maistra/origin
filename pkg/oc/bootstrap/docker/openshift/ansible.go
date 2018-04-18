@@ -108,10 +108,10 @@ openshift_istio_install_auth={{.IstioInstallAuth}}
 openshift_istio_install_launcher={{.IstioInstallLauncher}}
 openshift_istio_master_public_url={{.MasterPublicURL}}
 openshift_istio_jaeger_image_version={{.IstioJaegerImageVersion}}
-{{with .LauncherOpenShiftUser}}launcher_openshift_user=.{{end}}
-{{with .LauncherOpenShiftPassword}}launcher_openshift_password=.{{end}}
-{{with .LauncherGitHubUsername}}launcher_github_username=.{{end}}
-{{with .LauncherGitHubToken}}launcher_github_token=.{{end}}
+{{with .LauncherOpenShiftUser}}launcher_openshift_user={{.}}{{end}}
+{{with .LauncherOpenShiftPassword}}launcher_openshift_pwd={{.}}{{end}}
+{{with .LauncherGitHubUsername}}launcher_github_username={{.}}{{end}}
+{{with .LauncherGitHubToken}}launcher_github_token={{.}}{{end}}
 
 [masters]
 {{.MasterIP}} ansible_connection=local

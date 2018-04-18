@@ -308,8 +308,8 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.BoolVar(&config.ShouldInstallLauncher, "launcher", false, "Install Launcher for RHOAR Boosters (experimental)")
 	flags.StringVar(&config.LauncherOpenShiftUser, "launcher-openshift-user", "", "OpenShift user for Launcher (experimental)")
 	flags.StringVar(&config.LauncherOpenShiftPassword, "launcher-openshift-password", "", "OpenShift password for Launcher (experimental)")
-	flags.StringVar(&config.LauncherGitHubUsername, "launcher-openshift-username", "", "GitHub username for Launcher (experimental)")
-	flags.StringVar(&config.LauncherGitHubToken, "launcher-openshift-token", "", "GitHub token for Launcher (experimental)")
+	flags.StringVar(&config.LauncherGitHubUsername, "launcher-github-username", "", "GitHub username for Launcher (experimental)")
+	flags.StringVar(&config.LauncherGitHubToken, "launcher-github-token", "", "GitHub token for Launcher (experimental)")
 }
 
 // Start runs the start tasks ensuring that they are executed in sequence
