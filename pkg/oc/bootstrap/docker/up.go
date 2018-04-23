@@ -54,6 +54,8 @@ const (
 	developmentRedirectURI = "https://localhost:9000"
 
 	dockerAPIVersion122 = "1.22"
+
+	istioInitScript = "/tmp/istio-init"
 )
 
 var (
@@ -996,13 +998,21 @@ func (c *ClientStartConfig) StartOpenShift(out io.Writer) error {
 		NoProxy:                  c.NoProxy,
 		DockerRoot:               dockerRoot,
 		ServiceCatalog:           c.ShouldInstallServiceCatalog,
-		MutatingAdmissionWebhook: c.ShouldInstallIstio || c.ShouldInstallIstioCommunity,
 	}
 	if c.ShouldInstallMetrics {
 		opt.MetricsHost = openshift.MetricsHost(c.RoutingSuffix, c.ServerIP)
 	}
 	if c.ShouldInstallLogging {
 		opt.LoggingHost = openshift.LoggingHost(c.RoutingSuffix, c.ServerIP)
+	}
+	if c.ShouldInstallIstio || c.ShouldInstallIstioCommunity {
+		opt.MutatingAdmissionWebhook = true
+		if opt.AdditionalFiles == nil {
+			opt.AdditionalFiles = make(map[string][]byte)
+		}
+		opt.AdditionalFiles[istioInitScript] = []byte("sysctl -w vm.max_map_count=262144\nexec /usr/bin/openshift \"$@\"\n")
+		opt.Entrypoint = "/bin/bash"
+		opt.EntrypointArgs = []string {istioInitScript}
 	}
 	c.LocalConfigDir, err = c.OpenShiftHelper().Start(opt, out)
 	if err != nil {

@@ -133,6 +133,9 @@ type StartOptions struct {
 	DockerRoot               string
 	ServiceCatalog           bool
 	MutatingAdmissionWebhook bool
+	AdditionalFiles          map[string][]byte
+	Entrypoint               string
+	EntrypointArgs           []string
 }
 
 // NewHelper creates a new OpenShift helper
@@ -393,7 +396,9 @@ func (h *Helper) Start(opt *StartOptions, out io.Writer) (string, error) {
 		HostPid().
 		Bind(binds...).
 		Env(env...).
-		Command(startCmd...).
+		Command(append(opt.EntrypointArgs, startCmd...)...).
+		Copy(opt.AdditionalFiles).
+		Entrypoint(opt.Entrypoint).
 		Start()
 	if err != nil {
 		return "", errors.NewError("cannot start OpenShift daemon").WithCause(err)
@@ -510,6 +515,14 @@ func (h *Helper) StartNode(opt *StartOptions, out io.Writer) error {
 		startCmd = append(startCmd, fmt.Sprintf("--loglevel=%d", opt.LogLevel))
 	}
 
+	nodeContent := make(map[string][]byte)
+	if len(opt.AdditionalFiles) > 0 {
+		for key, value := range opt.AdditionalFiles {
+			nodeContent[key] = value
+		}
+	}
+	nodeContent["kubeconfig"] = []byte(opt.KubeconfigContents)
+
 	_, err := h.runHelper.New().Image(h.image).
 		Name(h.containerName).
 		Privileged().
@@ -517,10 +530,9 @@ func (h *Helper) StartNode(opt *StartOptions, out io.Writer) error {
 		HostPid().
 		Bind(binds...).
 		Env(env...).
-		Command(startCmd...).
-		Copy(map[string][]byte{
-			kubeconfig: []byte(opt.KubeconfigContents),
-		}).
+		Command(append(opt.EntrypointArgs, startCmd...)...).
+		Copy(nodeContent).
+		Entrypoint(opt.Entrypoint).
 		Start()
 	if err != nil {
 		return errors.NewError("cannot start OpenShift Node daemon").WithCause(err)
