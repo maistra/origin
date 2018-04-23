@@ -1011,8 +1011,7 @@ func (c *ClientStartConfig) StartOpenShift(out io.Writer) error {
 			opt.AdditionalFiles = make(map[string][]byte)
 		}
 		opt.AdditionalFiles[istioInitScript] = []byte("sysctl -w vm.max_map_count=262144\nexec /usr/bin/openshift \"$@\"\n")
-		opt.Entrypoint = "/bin/bash"
-		opt.EntrypointArgs = []string {istioInitScript}
+		opt.Entrypoint = []string {"/bin/bash", istioInitScript}
 	}
 	c.LocalConfigDir, err = c.OpenShiftHelper().Start(opt, out)
 	if err != nil {

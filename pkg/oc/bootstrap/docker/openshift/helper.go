@@ -134,8 +134,7 @@ type StartOptions struct {
 	ServiceCatalog           bool
 	MutatingAdmissionWebhook bool
 	AdditionalFiles          map[string][]byte
-	Entrypoint               string
-	EntrypointArgs           []string
+	Entrypoint               []string
 }
 
 // NewHelper creates a new OpenShift helper
@@ -396,9 +395,9 @@ func (h *Helper) Start(opt *StartOptions, out io.Writer) (string, error) {
 		HostPid().
 		Bind(binds...).
 		Env(env...).
-		Command(append(opt.EntrypointArgs, startCmd...)...).
+		Command(startCmd...).
 		Copy(opt.AdditionalFiles).
-		Entrypoint(opt.Entrypoint).
+		Entrypoint(opt.Entrypoint...).
 		Start()
 	if err != nil {
 		return "", errors.NewError("cannot start OpenShift daemon").WithCause(err)
@@ -530,9 +529,9 @@ func (h *Helper) StartNode(opt *StartOptions, out io.Writer) error {
 		HostPid().
 		Bind(binds...).
 		Env(env...).
-		Command(append(opt.EntrypointArgs, startCmd...)...).
+		Command(startCmd...).
 		Copy(nodeContent).
-		Entrypoint(opt.Entrypoint).
+		Entrypoint(opt.Entrypoint...).
 		Start()
 	if err != nil {
 		return errors.NewError("cannot start OpenShift Node daemon").WithCause(err)
