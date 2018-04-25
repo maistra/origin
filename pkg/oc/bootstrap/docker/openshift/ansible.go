@@ -114,6 +114,7 @@ openshift_istio_jaeger_image_version={{.IstioJaegerImageVersion}}
 {{with .LauncherGitHubToken}}launcher_github_token={{.}}{{end}}
 {{with .LauncherCatalogGitRepo}}launcher_catalog_git_repo={{.}}{{end}}
 {{with .LauncherCatalogGitBranch}}launcher_catalog_git_branch={{.}}{{end}}
+{{with .LauncherBoosterCatalogFilter}}launcher_booster_catalog_filter={{.}}{{end}}
 
 [masters]
 {{.MasterIP}} ansible_connection=local
@@ -141,19 +142,20 @@ type ansibleMetricsInventoryParams struct {
 }
 
 type ansibleIstioInventoryParams struct {
-	IstioImagePrefix          string
-	IstioImageVersion         string
-	IstioNamespace            string
-	IstioInstallCommunity     bool
-	IstioInstallAuth          bool
-	IstioInstallLauncher      bool
-	IstioJaegerImageVersion   string
-	LauncherOpenShiftUser     string
-	LauncherOpenShiftPassword string
-	LauncherGitHubUsername    string
-	LauncherGitHubToken       string
-	LauncherCatalogGitRepo    string
-	LauncherCatalogGitBranch  string
+	IstioImagePrefix             string
+	IstioImageVersion            string
+	IstioNamespace               string
+	IstioInstallCommunity        bool
+	IstioInstallAuth             bool
+	IstioInstallLauncher         bool
+	IstioJaegerImageVersion      string
+	LauncherOpenShiftUser        string
+	LauncherOpenShiftPassword    string
+	LauncherGitHubUsername       string
+	LauncherGitHubToken          string
+	LauncherCatalogGitRepo       string
+	LauncherCatalogGitBranch     string
+	LauncherBoosterCatalogFilter string
 }
 
 type ansibleInventoryParams struct {
