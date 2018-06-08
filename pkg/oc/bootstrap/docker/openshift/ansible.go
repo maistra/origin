@@ -107,7 +107,7 @@ openshift_istio_install_community={{.IstioInstallCommunity}}
 openshift_istio_install_auth={{.IstioInstallAuth}}
 openshift_istio_install_launcher={{.IstioInstallLauncher}}
 openshift_istio_master_public_url={{.MasterPublicURL}}
-openshift_istio_jaeger_image_version={{.IstioJaegerImageVersion}}
+{{with .IstioJaegerImageVersion}}openshift_istio_jaeger_image_version={{.}}{{end}}
 {{with .LauncherOpenShiftUser}}launcher_openshift_user={{.}}{{end}}
 {{with .LauncherOpenShiftPassword}}launcher_openshift_pwd={{.}}{{end}}
 {{with .LauncherGitHubUsername}}launcher_github_username={{.}}{{end}}
@@ -115,6 +115,10 @@ openshift_istio_jaeger_image_version={{.IstioJaegerImageVersion}}
 {{with .LauncherCatalogGitRepo}}launcher_catalog_git_repo={{.}}{{end}}
 {{with .LauncherCatalogGitBranch}}launcher_catalog_git_branch={{.}}{{end}}
 {{with .LauncherBoosterCatalogFilter}}launcher_booster_catalog_filter={{.}}{{end}}
+
+{{with .IstioKialiImageVersion}}openshift_istio_kiali_image_version={{.}}{{end}}
+{{with .IstioKialiUsername}}openshift_istio_kiali_username={{.}}{{end}}
+{{with .IstioKialiPassword}}openshift_istio_kiali_password={{.}}{{end}}
 
 [masters]
 {{.MasterIP}} ansible_connection=local
@@ -156,6 +160,9 @@ type ansibleIstioInventoryParams struct {
 	LauncherCatalogGitRepo       string
 	LauncherCatalogGitBranch     string
 	LauncherBoosterCatalogFilter string
+	IstioKialiImageVersion       string
+	IstioKialiUsername           string
+	IstioKialiPassword           string
 }
 
 type ansibleInventoryParams struct {

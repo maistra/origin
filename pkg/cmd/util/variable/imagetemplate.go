@@ -33,9 +33,9 @@ var (
 	// This value should be set duing build via -ldflags.
 	DefaultIstioImageVersion string
 
-	// DefaultIstioJaegerImageVersion is the default tag for all istio jaeger container images.
-	// This value should be set duing build via -ldflags.
-	DefaultIstioJaegerImageVersion string
+	// DefaultIstioKialiImageVersion is the default tag for all istio kiali container images.
+	// This value should be set during build via -ldflags.
+	DefaultIstioKialiImageVersion string
 
 	// defaultImageFormat is the default format for container image names used
 	// to run containerized components of the platform

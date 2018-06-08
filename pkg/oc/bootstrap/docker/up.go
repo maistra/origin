@@ -275,6 +275,10 @@ type CommonStartConfig struct {
 	LauncherCatalogGitRepo           string
 	LauncherCatalogGitBranch         string
 	LauncherBoosterCatalogFilter     string
+
+	IstioKialiImageVersion           string
+	IstioKialiUsername               string
+	IstioKialiPassword               string
 }
 
 func (c *CommonStartConfig) addTask(t task) {
@@ -309,7 +313,7 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.StringArrayVar(&config.NoProxy, "no-proxy", config.NoProxy, "List of hosts or subnets for which a proxy should not be used")
 	flags.StringVar(&config.IstioImageVersion, "istio-version", variable.DefaultIstioImageVersion, "Specify the tag for Istio images (experimental)")
 	flags.StringVar(&config.IstioImagePrefix, "istio-image-prefix", variable.DefaultIstioImagePrefix, "Specify the image prefix to use for Istio (experimental)")
-	flags.StringVar(&config.IstioJaegerImageVersion, "istio-jaeger-version", variable.DefaultIstioJaegerImageVersion, "Specify the tag for Istio Jaeger images (experimental)")
+	flags.StringVar(&config.IstioJaegerImageVersion, "istio-jaeger-version", "", "Specify the tag for Istio Jaeger images (experimental)")
 	flags.BoolVar(&config.ShouldInstallLauncher, "launcher", false, "Install Launcher for RHOAR Boosters (experimental)")
 	flags.StringVar(&config.LauncherOpenShiftUser, "launcher-openshift-user", "", "OpenShift user for Launcher (experimental)")
 	flags.StringVar(&config.LauncherOpenShiftPassword, "launcher-openshift-password", "", "OpenShift password for Launcher (experimental)")
@@ -318,6 +322,9 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.StringVar(&config.LauncherCatalogGitRepo, "launcher-catalog-git-repo", "", "GitHub repository for the Launcher catalog (experimental)")
 	flags.StringVar(&config.LauncherCatalogGitBranch, "launcher-catalog-git-branch", "", "GitHub branch for the Launcher catalog (experimental)")
 	flags.StringVar(&config.LauncherBoosterCatalogFilter, "launcher-booster-catalog-filter", "", "Expression to filter boosters from the repository (experimental)")
+	flags.StringVar(&config.IstioKialiImageVersion, "istio-kiali-version", variable.DefaultIstioKialiImageVersion, "Specify the tag for Istio Kiali images (experimental)")
+	flags.StringVar(&config.IstioKialiUsername, "istio-kiali-username", "", "Specify the username for accessing the Kiali console (experimental)")
+	flags.StringVar(&config.IstioKialiPassword, "istio-kiali-password", "", "Specify the password for accessing the Kiali console (experimental)")
 }
 
 // Start runs the start tasks ensuring that they are executed in sequence
@@ -1292,7 +1299,11 @@ func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
 			c.LauncherGitHubToken,
 			c.LauncherCatalogGitRepo,
 			c.LauncherCatalogGitBranch,
-			c.LauncherBoosterCatalogFilter)
+			c.LauncherBoosterCatalogFilter,
+			c.IstioKialiImageVersion,
+			c.IstioKialiUsername,
+			c.IstioKialiPassword,
+		)
 	}
 	return errors.NewError("Could not install Istio, you must be running on version 3.9 or later")
 }
