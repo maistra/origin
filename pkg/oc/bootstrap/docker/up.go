@@ -264,21 +264,21 @@ type CommonStartConfig struct {
 
 	containerNetworkErr chan error
 
-	IstioImageVersion                string
-	IstioImagePrefix                 string
-	IstioJaegerImageVersion          string
+	IstioImageVersion       string
+	IstioImagePrefix        string
+	IstioJaegerImageVersion string
 
-	LauncherOpenShiftUser            string
-	LauncherOpenShiftPassword        string
-	LauncherGitHubUsername           string
-	LauncherGitHubToken              string
-	LauncherCatalogGitRepo           string
-	LauncherCatalogGitBranch         string
-	LauncherBoosterCatalogFilter     string
+	LauncherOpenShiftUser        string
+	LauncherOpenShiftPassword    string
+	LauncherGitHubUsername       string
+	LauncherGitHubToken          string
+	LauncherCatalogGitRepo       string
+	LauncherCatalogGitBranch     string
+	LauncherBoosterCatalogFilter string
 
-	IstioKialiImageVersion           string
-	IstioKialiUsername               string
-	IstioKialiPassword               string
+	IstioKialiImageVersion string
+	IstioKialiUsername     string
+	IstioKialiPassword     string
 }
 
 func (c *CommonStartConfig) addTask(t task) {
@@ -1016,11 +1016,12 @@ func (c *ClientStartConfig) StartOpenShift(out io.Writer) error {
 	}
 	if c.ShouldInstallIstio || c.ShouldInstallIstioCommunity {
 		opt.MutatingAdmissionWebhook = true
+		opt.ValidatingAdmissionWebhook = true
 		if opt.AdditionalFiles == nil {
 			opt.AdditionalFiles = make(map[string][]byte)
 		}
 		opt.AdditionalFiles[istioInitScript] = []byte("sysctl -w vm.max_map_count=262144\nexec /usr/bin/openshift \"$@\"\n")
-		opt.Entrypoint = []string {"/bin/bash", istioInitScript}
+		opt.Entrypoint = []string{"/bin/bash", istioInitScript}
 	}
 	c.LocalConfigDir, err = c.OpenShiftHelper().Start(opt, out)
 	if err != nil {
