@@ -21,8 +21,11 @@ const (
 )
 
 // InstallIstio checks whether istio is installed and installs it if not already installed
-func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version, serverIP, publicHostname, oseVersion, istioVersion, istioPrefix, istioJaegerVersion, hostConfigDir, imageStreams string,
-	installCommunity, installAuth, installLauncher bool, launcherOpenShiftUser, launcherOpenShiftPassword, launcherGitHubUsername, launcherGitHubToken, launcherCatalogGitRepo, launcherCatalogGitBranch, launcherBoosterCatalogFilter string,
+func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version, serverIP,
+        publicHostname, oseVersion, istioVersion, istioPrefix, istioJaegerVersion, istioElasticsearchMemory,
+        hostConfigDir, imageStreams string, installCommunity, installAuth, installLauncher bool,
+        launcherOpenShiftUser, launcherOpenShiftPassword, launcherGitHubUsername, launcherGitHubToken,
+        launcherCatalogGitRepo, launcherCatalogGitBranch, launcherBoosterCatalogFilter string,
 	istioKialiVersion, istioKialiUsername, istioKialiPassword string) error {
 	kubeClient, err := f.ClientSet()
 	if err != nil {
@@ -61,6 +64,7 @@ func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version
 	params.IstioInstallLauncher = installLauncher
 	params.IstioNamespace = istioNamespace
 	params.IstioJaegerImageVersion = istioJaegerVersion
+	params.IstioElasticsearchMemory = istioElasticsearchMemory
 	params.LauncherOpenShiftUser = launcherOpenShiftUser
 	params.LauncherOpenShiftPassword = launcherOpenShiftPassword
 	params.LauncherGitHubUsername = launcherGitHubUsername

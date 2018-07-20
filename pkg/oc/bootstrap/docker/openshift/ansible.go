@@ -108,6 +108,7 @@ openshift_istio_install_auth={{.IstioInstallAuth}}
 openshift_istio_install_launcher={{.IstioInstallLauncher}}
 openshift_istio_master_public_url={{.MasterPublicURL}}
 {{with .IstioJaegerImageVersion}}openshift_istio_jaeger_image_version={{.}}{{end}}
+{{with .IstioElasticsearchMemory}}openshift_istio_elasticsearch_memory={{.}}{{end}}
 {{with .LauncherOpenShiftUser}}launcher_openshift_user={{.}}{{end}}
 {{with .LauncherOpenShiftPassword}}launcher_openshift_pwd={{.}}{{end}}
 {{with .LauncherGitHubUsername}}launcher_github_username={{.}}{{end}}
@@ -153,6 +154,7 @@ type ansibleIstioInventoryParams struct {
 	IstioInstallAuth             bool
 	IstioInstallLauncher         bool
 	IstioJaegerImageVersion      string
+	IstioElasticsearchMemory     string
 	LauncherOpenShiftUser        string
 	LauncherOpenShiftPassword    string
 	LauncherGitHubUsername       string

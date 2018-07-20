@@ -264,9 +264,10 @@ type CommonStartConfig struct {
 
 	containerNetworkErr chan error
 
-	IstioImageVersion       string
-	IstioImagePrefix        string
-	IstioJaegerImageVersion string
+	IstioImageVersion        string
+	IstioImagePrefix         string
+	IstioJaegerImageVersion  string
+	IstioElasticsearchMemory string
 
 	LauncherOpenShiftUser        string
 	LauncherOpenShiftPassword    string
@@ -314,6 +315,7 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.StringVar(&config.IstioImageVersion, "istio-version", variable.DefaultIstioImageVersion, "Specify the tag for Istio images (experimental)")
 	flags.StringVar(&config.IstioImagePrefix, "istio-image-prefix", variable.DefaultIstioImagePrefix, "Specify the image prefix to use for Istio (experimental)")
 	flags.StringVar(&config.IstioJaegerImageVersion, "istio-jaeger-version", "", "Specify the tag for Istio Jaeger images (experimental)")
+	flags.StringVar(&config.IstioElasticsearchMemory, "istio-elasticsearch-memory", "1Gi", "Specify the amount of memory required for the Elasticsearch deployments (experimental)")
 	flags.BoolVar(&config.ShouldInstallLauncher, "launcher", false, "Install Launcher for RHOAR Boosters (experimental)")
 	flags.StringVar(&config.LauncherOpenShiftUser, "launcher-openshift-user", "", "OpenShift user for Launcher (experimental)")
 	flags.StringVar(&config.LauncherOpenShiftPassword, "launcher-openshift-password", "", "OpenShift password for Launcher (experimental)")
@@ -1289,6 +1291,7 @@ func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
 			c.IstioImageVersion,
 			c.IstioImagePrefix,
 			c.IstioJaegerImageVersion,
+			c.IstioElasticsearchMemory,
 			c.HostConfigDir,
 			c.ImageStreams,
 			c.ShouldInstallIstioCommunity,
