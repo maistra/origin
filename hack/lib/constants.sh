@@ -107,6 +107,7 @@ function os::build::get_product_vars() {
   export OS_BUILD_LDFLAGS_IMAGE_PREFIX="${OS_IMAGE_PREFIX:-"openshift/origin"}"
   export OS_BUILD_LDFLAGS_ISTIO_IMAGE_PREFIX="${OS_ISTIO_IMAGE_PREFIX:-"openshiftistio/"}"
   export OS_BUILD_LDFLAGS_ISTIO_IMAGE_VERSION="${OS_ISTIO_IMAGE_VERSION:-"1.0.0-snapshot.2"}"
+  export OS_BUILD_LDFLAGS_ISTIO_KIALI_IMAGE_PREFIX="${OS_ISTIO_KIALI_IMAGE_VERSION:-"kiali/"}"
   export OS_BUILD_LDFLAGS_ISTIO_KIALI_IMAGE_VERSION="${OS_ISTIO_KIALI_IMAGE_VERSION:-"v0.5.0"}"
   export OS_BUILD_LDFLAGS_DEFAULT_IMAGE_STREAMS="${OS_BUILD_LDFLAGS_DEFAULT_IMAGE_STREAMS:-"centos7"}"
   export OS_BUILD_LDFLAGS_FEDERATION_SERVER_IMAGE_NAME="${OS_BUILD_LDFLAGS_FEDERATION_SERVER_IMAGE_NAME:-"${OS_BUILD_LDFLAGS_IMAGE_PREFIX}-federation"}"
@@ -133,6 +134,7 @@ function os::build::ldflags() {
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultImagePrefix" "${OS_BUILD_LDFLAGS_IMAGE_PREFIX}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultIstioImagePrefix" "${OS_BUILD_LDFLAGS_ISTIO_IMAGE_PREFIX}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultIstioImageVersion" "${OS_BUILD_LDFLAGS_ISTIO_IMAGE_VERSION}"))
+  ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultIstioKialiImagePrefix" "${OS_BUILD_LDFLAGS_ISTIO_KIALI_IMAGE_PREFIX}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultIstioKialiImageVersion" "${OS_BUILD_LDFLAGS_ISTIO_KIALI_IMAGE_VERSION}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.majorFromGit" "${OS_GIT_MAJOR}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.minorFromGit" "${OS_GIT_MINOR}"))

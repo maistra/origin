@@ -22,11 +22,11 @@ const (
 
 // InstallIstio checks whether istio is installed and installs it if not already installed
 func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version, serverIP,
-        publicHostname, oseVersion, istioVersion, istioPrefix, istioJaegerVersion, istioElasticsearchMemory,
-        hostConfigDir, imageStreams string, installCommunity, installAuth, installLauncher bool,
-        launcherOpenShiftUser, launcherOpenShiftPassword, launcherGitHubUsername, launcherGitHubToken,
-        launcherCatalogGitRepo, launcherCatalogGitBranch, launcherBoosterCatalogFilter string,
-	istioKialiVersion, istioKialiUsername, istioKialiPassword string) error {
+		publicHostname, oseVersion, istioVersion, istioPrefix, istioJaegerVersion, istioElasticsearchMemory,
+		hostConfigDir, imageStreams string, installCommunity, installAuth, installLauncher bool,
+		launcherOpenShiftUser, launcherOpenShiftPassword, launcherGitHubUsername, launcherGitHubToken,
+		launcherCatalogGitRepo, launcherCatalogGitBranch, launcherBoosterCatalogFilter string,
+		istioKialiPrefix, istioKialiVersion, istioKialiUsername, istioKialiPassword string) error {
 	kubeClient, err := f.ClientSet()
 	if err != nil {
 		return errors.NewError("cannot obtain API clients").WithCause(err).WithDetails(h.OriginLog())
@@ -72,6 +72,7 @@ func (h *Helper) InstallIstio(f *clientcmd.Factory, serverVersion semver.Version
 	params.LauncherCatalogGitRepo = launcherCatalogGitRepo
 	params.LauncherCatalogGitBranch = launcherCatalogGitBranch
 	params.LauncherBoosterCatalogFilter = launcherBoosterCatalogFilter
+	params.IstioKialiImagePrefix = istioKialiPrefix
 	params.IstioKialiImageVersion = istioKialiVersion
 	params.IstioKialiUsername = istioKialiUsername
 	params.IstioKialiPassword = istioKialiPassword

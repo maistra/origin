@@ -117,6 +117,7 @@ openshift_istio_master_public_url={{.MasterPublicURL}}
 {{with .LauncherCatalogGitBranch}}launcher_catalog_git_branch={{.}}{{end}}
 {{with .LauncherBoosterCatalogFilter}}launcher_booster_catalog_filter={{.}}{{end}}
 
+{{with .IstioKialiImagePrefix}}openshift_istio_kiali_image_prefix={{.}}{{end}}
 {{with .IstioKialiImageVersion}}openshift_istio_kiali_image_version={{.}}{{end}}
 {{with .IstioKialiUsername}}openshift_istio_kiali_username={{.}}{{end}}
 {{with .IstioKialiPassword}}openshift_istio_kiali_password={{.}}{{end}}
@@ -162,6 +163,7 @@ type ansibleIstioInventoryParams struct {
 	LauncherCatalogGitRepo       string
 	LauncherCatalogGitBranch     string
 	LauncherBoosterCatalogFilter string
+	IstioKialiImagePrefix        string
 	IstioKialiImageVersion       string
 	IstioKialiUsername           string
 	IstioKialiPassword           string

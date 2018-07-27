@@ -277,6 +277,7 @@ type CommonStartConfig struct {
 	LauncherCatalogGitBranch     string
 	LauncherBoosterCatalogFilter string
 
+	IstioKialiImagePrefix  string
 	IstioKialiImageVersion string
 	IstioKialiUsername     string
 	IstioKialiPassword     string
@@ -324,6 +325,7 @@ func (config *CommonStartConfig) Bind(flags *pflag.FlagSet) {
 	flags.StringVar(&config.LauncherCatalogGitRepo, "launcher-catalog-git-repo", "", "GitHub repository for the Launcher catalog (experimental)")
 	flags.StringVar(&config.LauncherCatalogGitBranch, "launcher-catalog-git-branch", "", "GitHub branch for the Launcher catalog (experimental)")
 	flags.StringVar(&config.LauncherBoosterCatalogFilter, "launcher-booster-catalog-filter", "", "Expression to filter boosters from the repository (experimental)")
+	flags.StringVar(&config.IstioKialiImagePrefix, "istio-kiali-image-prefix", variable.DefaultIstioKialiImagePrefix, "Specify the prefix for the Istio Kiali images (experimental)")
 	flags.StringVar(&config.IstioKialiImageVersion, "istio-kiali-version", variable.DefaultIstioKialiImageVersion, "Specify the tag for Istio Kiali images (experimental)")
 	flags.StringVar(&config.IstioKialiUsername, "istio-kiali-username", "", "Specify the username for accessing the Kiali console (experimental)")
 	flags.StringVar(&config.IstioKialiPassword, "istio-kiali-password", "", "Specify the password for accessing the Kiali console (experimental)")
@@ -1304,6 +1306,7 @@ func (c *ClientStartConfig) InstallIstio(out io.Writer) error {
 			c.LauncherCatalogGitRepo,
 			c.LauncherCatalogGitBranch,
 			c.LauncherBoosterCatalogFilter,
+			c.IstioKialiImagePrefix,
 			c.IstioKialiImageVersion,
 			c.IstioKialiUsername,
 			c.IstioKialiPassword,

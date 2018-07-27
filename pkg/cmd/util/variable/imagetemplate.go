@@ -33,6 +33,10 @@ var (
 	// This value should be set duing build via -ldflags.
 	DefaultIstioImageVersion string
 
+	// DefaultIstioKialiImagePrefix is the default prefix for all istio kiali container images.
+	// This value should be set during build via -ldflags.
+	DefaultIstioKialiImagePrefix string
+
 	// DefaultIstioKialiImageVersion is the default tag for all istio kiali container images.
 	// This value should be set during build via -ldflags.
 	DefaultIstioKialiImageVersion string
