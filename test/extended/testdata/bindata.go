@@ -258,6 +258,8 @@
 // install/automationservicebroker/install-rbac.yaml
 // install/automationservicebroker/install.yaml
 // install/etcd/etcd.yaml
+// install/istio/install-rbac.yaml
+// install/istio/install.yaml
 // install/kube-apiserver/apiserver.yaml
 // install/kube-controller-manager/kube-controller-manager.yaml
 // install/kube-dns/install.yaml
@@ -31515,6 +31517,170 @@ func installEtcdEtcdYaml() (*asset, error) {
 	return a, nil
 }
 
+var _installIstioInstallRbacYaml = []byte(`apiVersion: template.openshift.io/v1
+kind: Template
+parameters:
+- name: NAMESPACE
+  value: istio-operator
+objects:
+- kind: Role
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: istio-operator
+  rules:
+  - apiGroups:
+    - istio.openshift.com
+    resources:
+    - "*"
+    verbs:
+    - "*"
+  - apiGroups:
+    - ""
+    resources:
+    - pods
+    - services
+    - endpoints
+    - persistentvolumeclaims
+    - events
+    - configmaps
+    - secrets
+    - securitycontextconstraints
+    verbs:
+    - "*"
+  - apiGroups:
+    - apps
+    resources:
+    - deployments
+    - daemonsets
+    - replicasets
+    - statefulsets
+    verbs:
+    - "*"
+- kind: RoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1beta1
+  metadata:
+    name: default-account-istio-operator
+  subjects:
+  - kind: ServiceAccount
+    namespace: ${NAMESPACE}
+    name: default
+  roleRef:
+    kind: Role
+    name: istio-operator
+    apiGroup: rbac.authorization.k8s.io
+- kind: ClusterRoleBinding
+  apiVersion: rbac.authorization.k8s.io/v1
+  metadata:
+    name: default-account-istio-operator-cluster-role-binding
+  subjects:
+  - kind: ServiceAccount
+    namespace: ${NAMESPACE}
+    name: default
+  roleRef:
+    kind: ClusterRole
+    name: cluster-admin
+    apiGroup: rbac.authorization.k8s.io
+`)
+
+func installIstioInstallRbacYamlBytes() ([]byte, error) {
+	return _installIstioInstallRbacYaml, nil
+}
+
+func installIstioInstallRbacYaml() (*asset, error) {
+	bytes, err := installIstioInstallRbacYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "install/istio/install-rbac.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _installIstioInstallYaml = []byte(`apiVersion: template.openshift.io/v1
+kind: Template
+parameters:
+- name: IMAGE
+  value: maistra/istio-operator:0.1.0
+- name: PULL_POLICY
+  value: Always
+- name: NAMESPACE
+  value: istio-operator
+- name: RELEASE
+  value: v3.10
+- name: MASTER_PUBLIC_URL
+  value: https://127.0.0.1:8443
+objects:
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: installations.istio.openshift.com
+    labels:
+      name: istio-operator
+  spec:
+    group: istio.openshift.com
+    names:
+      kind: Installation
+      plural: installations
+      singular: installation
+    scope: Namespaced
+    version: v1alpha1
+
+
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    namespace: ${NAMESPACE}
+    name: istio-operator
+    labels:
+      name: istio-operator
+  spec:
+    replicas: 1
+    selector:
+      matchLabels:
+        name: istio-operator
+    template:
+      metadata:
+        labels:
+          name: istio-operator
+      spec:
+        containers:
+        - name: istio-operator
+          image: ${IMAGE}
+          imagePullPolicy: ${PULL_POLICY}
+          ports:
+          - containerPort: 60000
+            name: metrics
+          command:
+          - istio-operator
+          args:
+          - "--release=${RELEASE}"
+          - "--masterPublicURL=${MASTER_PUBLIC_URL}"
+          env:
+          - name: WATCH_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: OPERATOR_NAME
+            value: "istio-operator"
+`)
+
+func installIstioInstallYamlBytes() ([]byte, error) {
+	return _installIstioInstallYaml, nil
+}
+
+func installIstioInstallYaml() (*asset, error) {
+	bytes, err := installIstioInstallYamlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "install/istio/install.yaml", size: 0, mode: os.FileMode(0), modTime: time.Unix(0, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 var _installKubeApiserverApiserverYaml = []byte(`kind: Pod
 apiVersion: v1
 metadata:
@@ -33402,6 +33568,8 @@ var _bindata = map[string]func() (*asset, error){
 	"install/automationservicebroker/install-rbac.yaml": installAutomationservicebrokerInstallRbacYaml,
 	"install/automationservicebroker/install.yaml": installAutomationservicebrokerInstallYaml,
 	"install/etcd/etcd.yaml": installEtcdEtcdYaml,
+	"install/istio/install-rbac.yaml": installIstioInstallRbacYaml,
+	"install/istio/install.yaml": installIstioInstallYaml,
 	"install/kube-apiserver/apiserver.yaml": installKubeApiserverApiserverYaml,
 	"install/kube-controller-manager/kube-controller-manager.yaml": installKubeControllerManagerKubeControllerManagerYaml,
 	"install/kube-dns/install.yaml": installKubeDnsInstallYaml,
@@ -33533,6 +33701,10 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		}},
 		"etcd": &bintree{nil, map[string]*bintree{
 			"etcd.yaml": &bintree{installEtcdEtcdYaml, map[string]*bintree{}},
+		}},
+		"istio": &bintree{nil, map[string]*bintree{
+			"install-rbac.yaml": &bintree{installIstioInstallRbacYaml, map[string]*bintree{}},
+			"install.yaml": &bintree{installIstioInstallYaml, map[string]*bintree{}},
 		}},
 		"kube-apiserver": &bintree{nil, map[string]*bintree{
 			"apiserver.yaml": &bintree{installKubeApiserverApiserverYaml, map[string]*bintree{}},

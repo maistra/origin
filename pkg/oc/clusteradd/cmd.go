@@ -18,6 +18,7 @@ import (
 	"github.com/openshift/origin/pkg/oc/clusteradd/componentinstall"
 	"github.com/openshift/origin/pkg/oc/clusteradd/components/automation-service-broker"
 	"github.com/openshift/origin/pkg/oc/clusteradd/components/default-imagestreams"
+	"github.com/openshift/origin/pkg/oc/clusteradd/components/istio"
 	"github.com/openshift/origin/pkg/oc/clusteradd/components/registry"
 	"github.com/openshift/origin/pkg/oc/clusteradd/components/router"
 	"github.com/openshift/origin/pkg/oc/clusteradd/components/sample-templates"
@@ -77,6 +78,9 @@ var availableComponents = map[string]func(ctx componentinstall.Context) componen
 	},
 	"web-console": func(ctx componentinstall.Context) componentinstall.Component {
 		return &web_console_operator.WebConsoleOperatorComponentOptions{InstallContext: ctx}
+	},
+	"istio": func(ctx componentinstall.Context) componentinstall.Component {
+		return &istio.IstioComponentOptions{InstallContext: ctx}
 	},
 }
 

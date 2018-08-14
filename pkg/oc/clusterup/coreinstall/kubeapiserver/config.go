@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"github.com/docker/docker/api/types"
@@ -89,6 +90,30 @@ func (opt KubeAPIServerStartConfig) MakeMasterConfig(dockerClient dockerhelper.I
 	}
 	masterconfig := configObj.(*configapi.MasterConfig)
 	masterconfig.KubernetesMasterConfig.APIServerArguments["feature-gates"] = []string{"CustomResourceSubresources=true"}
+
+	mutatingAdmissionWebhookConfig := configapi.AdmissionPluginConfig {
+		Configuration: &configapi.DefaultAdmissionConfig {
+			TypeMeta: metav1.TypeMeta {
+				APIVersion: "v1",
+				Kind: "DefaultAdmissionConfig",
+			},
+			Disable: false,
+		},
+	}
+	validatingAdmissionWebhookConfig := configapi.AdmissionPluginConfig{
+		Configuration: &configapi.DefaultAdmissionConfig{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "v1",
+				Kind:       "DefaultAdmissionConfig",
+			},
+			Disable: false,
+		},
+	}
+	if masterconfig.AdmissionConfig.PluginConfig == nil {
+		masterconfig.AdmissionConfig.PluginConfig = make(map[string]*configapi.AdmissionPluginConfig)
+	}
+	masterconfig.AdmissionConfig.PluginConfig["MutatingAdmissionWebhook"] = &mutatingAdmissionWebhookConfig
+	masterconfig.AdmissionConfig.PluginConfig["ValidatingAdmissionWebhook"] = &validatingAdmissionWebhookConfig
 	configBytes, err := runtime.Encode(configapilatest.Codec, masterconfig)
 	if err != nil {
 		return "", err
