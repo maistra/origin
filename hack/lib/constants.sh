@@ -27,6 +27,8 @@ readonly OS_OUTPUT_RPMPATH="${OS_OUTPUT_RELEASEPATH}/rpms"
 readonly OS_OUTPUT_BINPATH="${OS_OUTPUT}/bin"
 readonly OS_OUTPUT_PKGDIR="${OS_OUTPUT}/pkgdir"
 
+readonly OS_ISTIO_VERSION="${OS_ISTIO_VERSION:-0.1.0}"
+
 readonly OS_SDN_COMPILE_TARGETS_LINUX=(
   cmd/sdn-cni-plugin
   vendor/github.com/containernetworking/plugins/plugins/ipam/host-local
@@ -125,6 +127,7 @@ function os::build::ldflags() {
 
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/oc/clusterup.defaultImageStreams" "${OS_BUILD_LDFLAGS_DEFAULT_IMAGE_STREAMS}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/cmd/util/variable.DefaultImagePrefix" "${OS_BUILD_LDFLAGS_IMAGE_PREFIX}"))
+  ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/oc/clusteradd/components/istio.IstioVersion" "${OS_ISTIO_VERSION}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.majorFromGit" "${OS_GIT_MAJOR}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.minorFromGit" "${OS_GIT_MINOR}"))
   ldflags+=($(os::build::ldflag "${OS_GO_PACKAGE}/pkg/version.versionFromGit" "${OS_GIT_VERSION}"))

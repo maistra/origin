@@ -83,6 +83,7 @@ func (opt KubeAPIServerStartConfig) MakeMasterConfig(dockerClient dockerhelper.I
 	}
 
 	addImagePolicyAdmission(&masterconfig.AdmissionConfig)
+	addAdmissionWebhooks(&masterconfig.AdmissionConfig)
 
 	if err := componentinstall.WriteMasterConfig(masterconfigFilename, masterconfig); err != nil {
 		return "", err
@@ -102,5 +103,23 @@ func addImagePolicyAdmission(admissionConfig *configapi.AdmissionConfig) {
 "value":"true"}],"skipOnResolutionFailure":true}]}`)
 	admissionConfig.PluginConfig["openshift.io/ImagePolicy"] = &configapi.AdmissionPluginConfig{
 		Configuration: runtime.RawExtension{Raw: policyConfig},
+	}
+}
+
+func addAdmissionWebhooks(admissionConfig *configapi.AdmissionConfig) {
+	// default openshift admission webhooks
+	if admissionConfig.PluginConfig == nil {
+		admissionConfig.PluginConfig = map[string]*configapi.AdmissionPluginConfig{}
+	}
+	// Add default mutating admission webhook into openshift api master config
+	mutatingAdmissionWebhookConfig := []byte(`{"kind":"DefaultAdmissionConfig","apiVersion":"v1","disable":false}`)
+	admissionConfig.PluginConfig["MutatingAdmissionWebhook"] = &configapi.AdmissionPluginConfig{
+		Configuration: runtime.RawExtension{Raw: mutatingAdmissionWebhookConfig},
+	}
+
+	// Add default validating admission webhook into openshift api master config
+	validatingAdmissionWebhookConfig := []byte(`{"kind":"DefaultAdmissionConfig","apiVersion":"v1","disable":false}`)
+	admissionConfig.PluginConfig["ValidatingAdmissionWebhook"] = &configapi.AdmissionPluginConfig{
+		Configuration: runtime.RawExtension{Raw: validatingAdmissionWebhookConfig},
 	}
 }
