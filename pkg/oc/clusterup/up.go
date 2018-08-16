@@ -214,8 +214,7 @@ var (
 	componentsDisabledByDefault = sets.NewString(
 		"automation-service-broker",
 		"service-catalog",
-		"template-service-broker",
-		"istio")
+		"template-service-broker")
 )
 
 func init() {
