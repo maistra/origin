@@ -28,6 +28,29 @@ objects:
     scope: Namespaced
     version: v1alpha1
 
+- apiVersion: extensions/v1beta1
+  kind: DaemonSet
+  metadata:
+    name: elasticsearch-sysctl
+  spec:
+    template:
+      metadata:
+        labels:
+          name: elasticsearch-sysctl
+      spec:
+        containers:
+        - name: elasticsearch-sysctl
+          image: ${IMAGE}
+          imagePullPolicy: ${PULL_POLICY}
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          restartPolicy: Always
+          command:
+          - "bash"
+          args:
+          - "-c"
+          - "while : ; do current=$(sysctl -n vm.max_map_count) ; if [ \"${current}\" -lt 262144 ] ; then echo \"$(date): Current vm.max_map_count setting is ${current}, updating to 262144 for Elasticsearch\" ; sysctl vm.max_map_count=262144 ; sleep 60 ; fi ; done"
 
 - apiVersion: apps/v1
   kind: Deployment
