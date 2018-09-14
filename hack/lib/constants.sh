@@ -27,7 +27,7 @@ readonly OS_OUTPUT_RPMPATH="${OS_OUTPUT_RELEASEPATH}/rpms"
 readonly OS_OUTPUT_BINPATH="${OS_OUTPUT}/bin"
 readonly OS_OUTPUT_PKGDIR="${OS_OUTPUT}/pkgdir"
 
-readonly OS_ISTIO_VERSION="${OS_ISTIO_VERSION:-0.1.0}"
+readonly OS_ISTIO_VERSION="${OS_ISTIO_VERSION:-0.2.0}"
 
 readonly OS_SDN_COMPILE_TARGETS_LINUX=(
   cmd/sdn-cni-plugin

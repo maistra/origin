@@ -32538,7 +32538,7 @@ var _installIstioInstallYaml = []byte(`apiVersion: template.openshift.io/v1
 kind: Template
 parameters:
 - name: IMAGE
-  value: maistra/istio-operator:0.1.0
+  value: maistra/istio-operator-centos7:0.2.0
 - name: PULL_POLICY
   value: Always
 - name: NAMESPACE
