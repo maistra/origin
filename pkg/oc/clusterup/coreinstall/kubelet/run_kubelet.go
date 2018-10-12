@@ -29,7 +29,6 @@ type KubeletRunConfig struct {
 func NewKubeletRunConfig() *KubeletRunConfig {
 	return &KubeletRunConfig{
 		ContainerBinds: []string{
-			"/var/lib/kubelet/device-plugins:/var/lib/kubelet/device-plugins:rw",
 			"/var/log:/var/log:rw",
 			"/var/run:/var/run:rw",
 			"/sys:/sys:rw",
