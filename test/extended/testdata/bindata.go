@@ -32461,7 +32461,7 @@ parameters:
   value: istio-operator
 objects:
 - kind: Role
-  apiVersion: rbac.authorization.k8s.io/v1beta1
+  apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     name: istio-operator
   rules:
@@ -32494,7 +32494,7 @@ objects:
     verbs:
     - "*"
 - kind: RoleBinding
-  apiVersion: rbac.authorization.k8s.io/v1beta1
+  apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     name: default-account-istio-operator
   subjects:
@@ -32538,7 +32538,7 @@ var _installIstioInstallYaml = []byte(`apiVersion: template.openshift.io/v1
 kind: Template
 parameters:
 - name: IMAGE
-  value: maistra/istio-operator-centos7:0.2.0
+  value: maistra/istio-operator-centos7:0.3.0
 - name: PULL_POLICY
   value: Always
 - name: NAMESPACE

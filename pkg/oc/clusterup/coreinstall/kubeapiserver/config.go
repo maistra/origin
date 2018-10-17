@@ -112,13 +112,18 @@ func addAdmissionWebhooks(admissionConfig *configapi.AdmissionConfig) {
 		admissionConfig.PluginConfig = map[string]*configapi.AdmissionPluginConfig{}
 	}
 	// Add default mutating admission webhook into openshift api master config
-	mutatingAdmissionWebhookConfig := []byte(`{"kind":"DefaultAdmissionConfig","apiVersion":"v1","disable":false}`)
+	// Using an alternative configuration because of an openshift issue
+	// mutatingAdmissionWebhookConfig := []byte(`{"kind":"DefaultAdmissionConfig","apiVersion":"v1","disable":false}`)
+	mutatingAdmissionWebhookConfig := []byte(`{"apiVersion":"apiserver.config.k8s.io/v1alpha1", "kubeConfigFile":"/dev/null", "kind": "WebhookAdmission"}`)
+
 	admissionConfig.PluginConfig["MutatingAdmissionWebhook"] = &configapi.AdmissionPluginConfig{
 		Configuration: runtime.RawExtension{Raw: mutatingAdmissionWebhookConfig},
 	}
 
 	// Add default validating admission webhook into openshift api master config
-	validatingAdmissionWebhookConfig := []byte(`{"kind":"DefaultAdmissionConfig","apiVersion":"v1","disable":false}`)
+	// Using an alternative configuration because of an openshift issue
+	// validatingAdmissionWebhookConfig := []byte(`{"kind":"DefaultAdmissionConfig","apiVersion":"v1","disable":false}`)
+	validatingAdmissionWebhookConfig := []byte(`{"apiVersion":"apiserver.config.k8s.io/v1alpha1", "kubeConfigFile":"/dev/null", "kind": "WebhookAdmission"}`)
 	admissionConfig.PluginConfig["ValidatingAdmissionWebhook"] = &configapi.AdmissionPluginConfig{
 		Configuration: runtime.RawExtension{Raw: validatingAdmissionWebhookConfig},
 	}
