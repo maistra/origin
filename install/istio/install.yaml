@@ -50,7 +50,7 @@ objects:
           - "bash"
           args:
           - "-c"
-          - "while : ; do current=$(sysctl -n vm.max_map_count) ; if [ \"${current}\" -lt 262144 ] ; then echo \"$(date): Current vm.max_map_count setting is ${current}, updating to 262144 for Elasticsearch\" ; sysctl vm.max_map_count=262144 ; sleep 60 ; fi ; done"
+          - "while : ; do current=$(sysctl -n vm.max_map_count) ; if [ \"${current}\" -lt 262144 ] ; then echo \"$(date): Current vm.max_map_count setting is ${current}, updating to 262144 for Elasticsearch\" ; sysctl vm.max_map_count=262144 ; fi; sleep 60 ; done"
 
 - apiVersion: apps/v1
   kind: Deployment
