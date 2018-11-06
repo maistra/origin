@@ -16851,7 +16851,7 @@ var _installIstioInstallYaml = []byte(`apiVersion: template.openshift.io/v1
 kind: Template
 parameters:
 - name: IMAGE
-  value: maistra/istio-operator-centos7:0.3.0
+  value: maistra/istio-operator-centos7:0.4.0
 - name: PULL_POLICY
   value: Always
 - name: NAMESPACE
@@ -16899,7 +16899,7 @@ objects:
           - "bash"
           args:
           - "-c"
-          - "while : ; do current=$(sysctl -n vm.max_map_count) ; if [ \"${current}\" -lt 262144 ] ; then echo \"$(date): Current vm.max_map_count setting is ${current}, updating to 262144 for Elasticsearch\" ; sysctl vm.max_map_count=262144 ; sleep 60 ; fi ; done"
+          - "while : ; do current=$(sysctl -n vm.max_map_count) ; if [ \"${current}\" -lt 262144 ] ; then echo \"$(date): Current vm.max_map_count setting is ${current}, updating to 262144 for Elasticsearch\" ; sysctl vm.max_map_count=262144 ; fi; sleep 60 ; done"
 
 - apiVersion: apps/v1
   kind: Deployment
