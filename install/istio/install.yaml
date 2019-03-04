@@ -2,7 +2,7 @@ apiVersion: template.openshift.io/v1
 kind: Template
 parameters:
 - name: IMAGE
-  value: maistra/istio-operator-centos7:0.8.0
+  value: maistra/istio-operator-centos7:0.9.0
 - name: PULL_POLICY
   value: Always
 - name: NAMESPACE
