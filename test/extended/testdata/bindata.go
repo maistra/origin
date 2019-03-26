@@ -32584,6 +32584,8 @@ objects:
         plural: installations
         singular: installation
       scope: Namespaced
+      subresources:
+        status: {}
       version: v1alpha1
 
   - apiVersion: extensions/v1beta1
