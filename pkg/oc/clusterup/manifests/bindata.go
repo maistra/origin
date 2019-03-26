@@ -16954,9 +16954,7 @@ objects:
                 - "--masterPublicURL=${MASTER_PUBLIC_URL}"
               env:
                 - name: WATCH_NAMESPACE
-                  valueFrom:
-                    fieldRef:
-                      fieldPath: metadata.namespace
+                  value: "istio-system"
                 - name: OPERATOR_NAME
                   value: "istio-operator"
 `)
