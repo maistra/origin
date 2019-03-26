@@ -16850,93 +16850,115 @@ func installIstioInstallRbacYaml() (*asset, error) {
 var _installIstioInstallYaml = []byte(`apiVersion: template.openshift.io/v1
 kind: Template
 parameters:
-- name: IMAGE
-  value: maistra/istio-operator-centos7:0.5.0
-- name: PULL_POLICY
-  value: Always
-- name: NAMESPACE
-  value: istio-operator
-- name: RELEASE
-  value: v3.10
-- name: MASTER_PUBLIC_URL
-  value: https://127.0.0.1:8443
+  - name: IMAGE
+    value: maistra/istio-operator-centos7:0.10.0
+  - name: PULL_POLICY
+    value: Always
+  - name: NAMESPACE
+    value: istio-operator
+  - name: RELEASE
+    value: v3.10
+  - name: MASTER_PUBLIC_URL
+    value: https://127.0.0.1:8443
 objects:
-
-- apiVersion: apiextensions.k8s.io/v1beta1
-  kind: CustomResourceDefinition
-  metadata:
-    name: installations.istio.openshift.com
-    labels:
+  - apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: istio-system
+  - apiVersion: v1
+    kind: ServiceAccount
+    metadata:
       name: istio-operator
-  spec:
-    group: istio.openshift.com
-    names:
-      kind: Installation
-      plural: installations
-      singular: installation
-    scope: Namespaced
-    version: v1alpha1
-
-- apiVersion: extensions/v1beta1
-  kind: DaemonSet
-  metadata:
-    name: elasticsearch-sysctl
-  spec:
-    template:
-      metadata:
-        labels:
-          name: elasticsearch-sysctl
-      spec:
-        containers:
-        - name: elasticsearch-sysctl
-          image: ${IMAGE}
-          imagePullPolicy: ${PULL_POLICY}
-          securityContext:
-            privileged: true
-            runAsUser: 0
-          restartPolicy: Always
-          command:
-          - "bash"
-          args:
-          - "-c"
-          - "while : ; do current=$(sysctl -n vm.max_map_count) ; if [ \"${current}\" -lt 262144 ] ; then echo \"$(date): Current vm.max_map_count setting is ${current}, updating to 262144 for Elasticsearch\" ; sysctl vm.max_map_count=262144 ; fi; sleep 60 ; done"
-
-- apiVersion: apps/v1
-  kind: Deployment
-  metadata:
-    namespace: ${NAMESPACE}
-    name: istio-operator
-    labels:
-      name: istio-operator
-  spec:
-    replicas: 1
-    selector:
-      matchLabels:
+  - apiVersion: apiextensions.k8s.io/v1beta1
+    kind: CustomResourceDefinition
+    metadata:
+      name: controlplanes.istio.openshift.com
+    spec:
+      group: istio.openshift.com
+      names:
+        kind: ControlPlane
+        listKind: ControlPlaneList
+        plural: controlplanes
+        singular: controlplane
+      scope: Namespaced
+      subresources:
+        status: {}
+      version: v1alpha3
+  - apiVersion: apiextensions.k8s.io/v1beta1
+    kind: CustomResourceDefinition
+    metadata:
+      name: installations.istio.openshift.com
+      labels:
         name: istio-operator
-    template:
-      metadata:
-        labels:
+    spec:
+      group: istio.openshift.com
+      names:
+        kind: Installation
+        plural: installations
+        singular: installation
+      scope: Namespaced
+      subresources:
+        status: {}
+      version: v1alpha1
+
+  - apiVersion: extensions/v1beta1
+    kind: DaemonSet
+    metadata:
+      name: elasticsearch-sysctl
+    spec:
+      template:
+        metadata:
+          labels:
+            name: elasticsearch-sysctl
+        spec:
+          containers:
+            - name: elasticsearch-sysctl
+              image: ${IMAGE}
+              imagePullPolicy: ${PULL_POLICY}
+              securityContext:
+                privileged: true
+                runAsUser: 0
+              restartPolicy: Always
+              command:
+                - "bash"
+              args:
+                - "-c"
+                - 'while : ; do current=$(sysctl -n vm.max_map_count) ; if [ "${current}" -lt 262144 ] ; then echo "$(date): Current vm.max_map_count setting is ${current}, updating to 262144 for Elasticsearch" ; sysctl vm.max_map_count=262144 ; fi; sleep 60 ; done'
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      namespace: ${NAMESPACE}
+      name: istio-operator
+      labels:
+        name: istio-operator
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
           name: istio-operator
-      spec:
-        containers:
-        - name: istio-operator
-          image: ${IMAGE}
-          imagePullPolicy: ${PULL_POLICY}
-          ports:
-          - containerPort: 60000
-            name: metrics
-          command:
-          - istio-operator
-          args:
-          - "--release=${RELEASE}"
-          - "--masterPublicURL=${MASTER_PUBLIC_URL}"
-          env:
-          - name: WATCH_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: OPERATOR_NAME
-            value: "istio-operator"
+      template:
+        metadata:
+          labels:
+            name: istio-operator
+        spec:
+          containers:
+            - name: istio-operator
+              image: ${IMAGE}
+              imagePullPolicy: ${PULL_POLICY}
+              ports:
+                - containerPort: 60000
+                  name: metrics
+              command:
+                - istio-operator
+              args:
+                - "--release=${RELEASE}"
+                - "--masterPublicURL=${MASTER_PUBLIC_URL}"
+              env:
+                - name: WATCH_NAMESPACE
+                  value: "istio-system"
+                - name: OPERATOR_NAME
+                  value: "istio-operator"
 `)
 
 func installIstioInstallYamlBytes() ([]byte, error) {
