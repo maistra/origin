@@ -79,10 +79,7 @@ objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      namespace: ${NAMESPACE}
       name: istio-operator
-      labels:
-        name: istio-operator
     spec:
       replicas: 1
       selector:
@@ -93,20 +90,31 @@ objects:
           labels:
             name: istio-operator
         spec:
+          serviceAccountName: istio-operator
+          volumes:
+            - name: discovery-cache
+              emptyDir:
+                medium: Memory
           containers:
             - name: istio-operator
               image: ${IMAGE}
-              imagePullPolicy: ${PULL_POLICY}
               ports:
                 - containerPort: 60000
                   name: metrics
               command:
                 - istio-operator
-              args:
-                - "--release=${RELEASE}"
-                - "--masterPublicURL=${MASTER_PUBLIC_URL}"
+                - --discoveryCacheDir
+                - /home/istio-operator/.kube/cache/discovery
+              imagePullPolicy: Always
               env:
                 - name: WATCH_NAMESPACE
-                  value: "istio-system"
+                  value: istio-system
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                    fieldPath: metadata.name
                 - name: OPERATOR_NAME
                   value: "istio-operator"
+              volumeMounts:
+                - name: discovery-cache
+                  mountPath: /home/istio-operator/.kube/cache/discovery
