@@ -20,6 +20,7 @@ objects:
     kind: ServiceAccount
     metadata:
       name: istio-operator
+      namespace: istio-operator
   - apiVersion: apiextensions.k8s.io/v1beta1
     kind: CustomResourceDefinition
     metadata:
@@ -65,7 +66,6 @@ objects:
           containers:
             - name: elasticsearch-sysctl
               image: ${IMAGE}
-              imagePullPolicy: ${PULL_POLICY}
               securityContext:
                 privileged: true
                 runAsUser: 0
@@ -79,7 +79,10 @@ objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
+      namespace: istio-operator
       name: istio-operator
+      labels:
+        name: istio-operator
     spec:
       replicas: 1
       selector:
@@ -98,6 +101,7 @@ objects:
           containers:
             - name: istio-operator
               image: ${IMAGE}
+              imagePullPolicy: ${PULL_POLICY}
               ports:
                 - containerPort: 60000
                   name: metrics
@@ -110,9 +114,7 @@ objects:
                 - name: WATCH_NAMESPACE
                   value: istio-system
                 - name: POD_NAME
-                  valueFrom:
-                    fieldRef:
-                    fieldPath: metadata.name
+                  value: istio-operator
                 - name: OPERATOR_NAME
                   value: "istio-operator"
               volumeMounts:

@@ -32556,6 +32556,7 @@ objects:
     kind: ServiceAccount
     metadata:
       name: istio-operator
+      namespace: istio-operator
   - apiVersion: apiextensions.k8s.io/v1beta1
     kind: CustomResourceDefinition
     metadata:
@@ -32601,7 +32602,6 @@ objects:
           containers:
             - name: elasticsearch-sysctl
               image: ${IMAGE}
-              imagePullPolicy: ${PULL_POLICY}
               securityContext:
                 privileged: true
                 runAsUser: 0
@@ -32615,7 +32615,7 @@ objects:
   - apiVersion: apps/v1
     kind: Deployment
     metadata:
-      namespace: ${NAMESPACE}
+      namespace: istio-operator
       name: istio-operator
       labels:
         name: istio-operator
@@ -32629,6 +32629,11 @@ objects:
           labels:
             name: istio-operator
         spec:
+          serviceAccountName: istio-operator
+          volumes:
+            - name: discovery-cache
+              emptyDir:
+                medium: Memory
           containers:
             - name: istio-operator
               image: ${IMAGE}
@@ -32638,14 +32643,19 @@ objects:
                   name: metrics
               command:
                 - istio-operator
-              args:
-                - "--release=${RELEASE}"
-                - "--masterPublicURL=${MASTER_PUBLIC_URL}"
+                - --discoveryCacheDir
+                - /home/istio-operator/.kube/cache/discovery
+              imagePullPolicy: Always
               env:
                 - name: WATCH_NAMESPACE
-                  value: "istio-system"
+                  value: istio-system
+                - name: POD_NAME
+                  value: istio-operator
                 - name: OPERATOR_NAME
                   value: "istio-operator"
+              volumeMounts:
+                - name: discovery-cache
+                  mountPath: /home/istio-operator/.kube/cache/discovery
 `)
 
 func installIstioInstallYamlBytes() ([]byte, error) {
