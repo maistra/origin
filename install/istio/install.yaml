@@ -89,6 +89,10 @@ objects:
         labels:
           name: istio-operator
       spec:
+        volumes:
+        - name: discovery-cache
+          emptyDir:
+            medium: Memory
         containers:
         - name: istio-operator
           image: ${IMAGE}
@@ -101,10 +105,19 @@ objects:
           args:
           - "--release=${RELEASE}"
           - "--masterPublicURL=${MASTER_PUBLIC_URL}"
+          - --discoveryCacheDir
+          - /home/istio-operator/.kube/cache/discovery
           env:
           - name: WATCH_NAMESPACE
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
           - name: OPERATOR_NAME
             value: "istio-operator"
+          volumeMounts:
+          - name: discovery-cache
+            mountPath: /home/istio-operator/.kube/cache/discovery

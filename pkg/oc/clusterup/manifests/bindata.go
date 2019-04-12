@@ -16773,17 +16773,11 @@ parameters:
 - name: NAMESPACE
   value: istio-operator
 objects:
-- kind: Role
+- kind: ClusterRole
   apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     name: istio-operator
   rules:
-  - apiGroups:
-    - istio.openshift.com
-    resources:
-    - "*"
-    verbs:
-    - "*"
   - apiGroups:
     - ""
     resources:
@@ -16794,9 +16788,12 @@ objects:
     - events
     - configmaps
     - secrets
+    - serviceaccounts
+    - namespaces
+    - routes
     - securitycontextconstraints
     verbs:
-    - "*"
+    - '*'
   - apiGroups:
     - apps
     resources:
@@ -16805,8 +16802,347 @@ objects:
     - replicasets
     - statefulsets
     verbs:
-    - "*"
-- kind: RoleBinding
+    - '*'
+  - apiGroups:
+    - autoscaling
+    resources:
+    - horizontalpodautoscalers
+    verbs:
+    - '*'
+  - apiGroups:
+    - extensions
+    resources:
+    - daemonsets
+    - deployments
+    verbs:
+    - '*'
+  - apiGroups:
+    - policy
+    resources:
+    - poddisruptionbudgets
+    verbs:
+    - '*'
+  - apiGroups:
+    - admissionregistration.k8s.io
+    resources:
+    - mutatingwebhookconfigurations
+    - validatingwebhookconfigurations
+    verbs:
+    - '*'
+  - apiGroups:
+    - certmanager.k8s.io
+    resources:
+    - clusterissuers
+    verbs:
+    - '*'
+  - apiGroups:
+    - rbac.authorization.k8s.io
+    resources:
+    - clusterrolebindings
+    - clusterroles
+    - roles
+    - rolebindings
+    verbs:
+    - '*'
+  - apiGroups:
+    - authentication.istio.io
+    resources:
+    # for galley, *: get, list, watch
+    # for mixer, *: create, get, list, watch
+    # for pilot, *: *
+    # for istio-authenticated, *: *
+    - '*'
+    - meshpolicies
+    verbs:
+    - '*'
+  - apiGroups:
+    - config.istio.io
+    resources:
+    # for galley, *: get, list, watch
+    # for pilot, *: *
+    # for istio-authenticated, *: *
+    - '*'
+    - attributemanifests
+    - handlers
+    - logentries
+    - rules
+    - metrics
+    - kuberneteses
+    verbs:
+    - '*'
+  - apiGroups:
+    - networking.istio.io
+    resources:
+    # for galley, *: get, list, watch
+    # for pilot, *: *
+    # for istio-authenticated, *: *
+    - '*'
+    - gateways
+    - destinationrules
+    - virtualservices
+    - envoyfilters
+    verbs:
+    - '*'
+  - apiGroups:
+    - monitoring.coreos.com
+    resources:
+    - servicemonitors
+    verbs:
+    - get
+    - create
+  - apiGroups:
+    - istio.openshift.com
+    resources:
+    - '*'
+    - istiocontrolplanes
+    - installations
+    verbs:
+    - '*'
+  - apiGroups:
+    - apps.openshift.io
+    resources:
+    - deploymentconfigs
+    verbs:
+    - '*'
+  - apiGroups:
+    - oauth.openshift.io
+    resources:
+    - oauthclients
+    verbs:
+    - '*'
+  - apiGroups:
+    - project.openshift.io
+    resources:
+    - projects
+    - projectrequests
+    verbs:
+    - '*'
+  - apiGroups:
+    - route.openshift.io
+    resources:
+    - routes
+    - routes/custom-host
+    verbs:
+    - '*'
+  - apiGroups:
+    - security.openshift.io
+    resources:
+    - securitycontextconstraints
+    verbs:
+    - '*'
+  # for galley (pilot and prometheus also watch nodes)
+  - apiGroups:
+    - ""
+    resources:
+    - nodes
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - extensions
+    resources:
+    - ingresses
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - extensions
+    - apps
+    resources:
+    - deployments/finalizers
+    resourceNames:
+    - istio-galley
+    - istio-sidecar0injector
+    verbs:
+    - update
+  # for mixer
+  - apiGroups:
+    - apiextensions.k8s.io
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - extensions
+    resources:
+    - replicasets
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - ""
+    resources:
+    - replicationcontrollers
+    verbs:
+    - get
+    - list
+    - watch
+  # for pilot
+  # for istio-authenticated, *: *
+  - apiGroups:
+    - rbac.istio.io
+    resources:
+    - '*'
+    verbs:
+    - '*'
+    - get
+    - list
+    - watch
+  - apiGroups:
+    - apiextensions.k8s.io
+    resources:
+    - customresourcedefinitions
+    verbs:
+    - '*'
+  - apiGroups:
+    - extensions
+    resources:
+    - ingresses
+    - ingresses/status
+    verbs:
+    - '*'
+  # prometheus
+  - apiGroups:
+    - ""
+    resources:
+    - nodes/proxy
+    verbs:
+    - get
+    - list
+    - watch
+  - nonResourceURLs:
+    - "/metrics"
+    verbs:
+    - get
+  # citadel
+  - apiGroups:
+    - authentication.k8s.io
+    resources:
+    - tokenreviews
+    verbs:
+    - create
+  # kiali
+  - apiGroups: [""]
+    resources:
+    - configmaps
+    - endpoints
+    - namespaces
+    - nodes
+    - pods
+    - services
+    - replicationcontrollers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups: ["extensions", "apps"]
+    resources:
+    - deployments
+    - statefulsets
+    - replicasets
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups: ["autoscaling"]
+    resources:
+    - horizontalpodautoscalers
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups: ["batch"]
+    resources:
+    - cronjobs
+    - jobs
+    verbs:
+    - '*'
+  - apiGroups: ["project.openshift.io"]
+    resources:
+    - projects
+    verbs:
+    - get
+  - apiGroups: ["route.openshift.io"]
+    resources:
+    - routes
+    verbs:
+    - get
+  - apiGroups: ["apps.openshift.io"]
+    resources:
+    - deploymentconfigs
+    verbs:
+    - get
+    - list
+    - watch
+  - apiGroups: ["config.istio.io"]
+    resources:
+    - apikeys
+    - authorizations
+    - checknothings
+    - circonuses
+    - deniers
+    - fluentds
+    - handlers
+    - kubernetesenvs
+    - kuberneteses
+    - listcheckers
+    - listentries
+    - logentries
+    - memquotas
+    - metrics
+    - opas
+    - prometheuses
+    - quotas
+    - quotaspecbindings
+    - quotaspecs
+    - rbacs
+    - reportnothings
+    - rules
+    - solarwindses
+    - stackdrivers
+    - statsds
+    - stdios
+    verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - watch
+  - apiGroups: ["networking.istio.io"]
+    resources:
+    - destinationrules
+    - gateways
+    - serviceentries
+    - virtualservices
+    verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - watch
+  - apiGroups: ["authentication.istio.io"]
+    resources:
+    - policies
+    verbs:
+    - create
+    - delete
+    - get
+    - list
+    - patch
+    - watch
+  - apiGroups: ["monitoring.kiali.io"]
+    resources:
+    - monitoringdashboards
+    verbs:
+    - get
+- kind: ClusterRoleBinding
   apiVersion: rbac.authorization.k8s.io/v1
   metadata:
     name: default-account-istio-operator
@@ -16815,20 +17151,8 @@ objects:
     namespace: ${NAMESPACE}
     name: default
   roleRef:
-    kind: Role
-    name: istio-operator
-    apiGroup: rbac.authorization.k8s.io
-- kind: ClusterRoleBinding
-  apiVersion: rbac.authorization.k8s.io/v1
-  metadata:
-    name: default-account-istio-operator-cluster-role-binding
-  subjects:
-  - kind: ServiceAccount
-    namespace: ${NAMESPACE}
-    name: default
-  roleRef:
     kind: ClusterRole
-    name: cluster-admin
+    name: istio-operator
     apiGroup: rbac.authorization.k8s.io
 `)
 
@@ -16938,6 +17262,10 @@ objects:
         labels:
           name: istio-operator
       spec:
+        volumes:
+        - name: discovery-cache
+          emptyDir:
+            medium: Memory
         containers:
         - name: istio-operator
           image: ${IMAGE}
@@ -16950,13 +17278,22 @@ objects:
           args:
           - "--release=${RELEASE}"
           - "--masterPublicURL=${MASTER_PUBLIC_URL}"
+          - --discoveryCacheDir
+          - /home/istio-operator/.kube/cache/discovery
           env:
           - name: WATCH_NAMESPACE
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
           - name: OPERATOR_NAME
             value: "istio-operator"
+          volumeMounts:
+          - name: discovery-cache
+            mountPath: /home/istio-operator/.kube/cache/discovery
 `)
 
 func installIstioInstallYamlBytes() ([]byte, error) {
