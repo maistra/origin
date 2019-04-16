@@ -32969,9 +32969,7 @@ objects:
           - /home/istio-operator/.kube/cache/discovery
           env:
           - name: WATCH_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
+            value: ""
           - name: POD_NAME
             valueFrom:
               fieldRef:
