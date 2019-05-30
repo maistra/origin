@@ -16791,7 +16791,6 @@ objects:
     - serviceaccounts
     - namespaces
     - routes
-    - securitycontextconstraints
     verbs:
     - '*'
   - apiGroups:
@@ -16891,11 +16890,22 @@ objects:
     - get
     - create
   - apiGroups:
+    - maistra.io
+    resources:
+    - servicemeshcontrolplanes
+    - servicemeshcontrolplanes/status
+    - servicemeshcontrolplanes/finalizers
+    - servicemeshmemberrolls
+    - servicemeshmemberrolls/status
+    - servicemeshmemberrolls/finalizers
+    verbs:
+    - '*'
+  - apiGroups:
     - istio.openshift.com
     resources:
-    - '*'
-    - istiocontrolplanes
-    - installations
+    - controlplanes
+    - controlplanes/status
+    - controlplanes/finalizers
     verbs:
     - '*'
   - apiGroups:
@@ -16954,7 +16964,7 @@ objects:
     - deployments/finalizers
     resourceNames:
     - istio-galley
-    - istio-sidecar0injector
+    - istio-sidecar-injector
     verbs:
     - update
   # for mixer
@@ -17034,6 +17044,7 @@ objects:
     - namespaces
     - nodes
     - pods
+    - pods/log
     - services
     - replicationcontrollers
     verbs:
@@ -17175,7 +17186,7 @@ var _installIstioInstallYaml = []byte(`apiVersion: template.openshift.io/v1
 kind: Template
 parameters:
 - name: IMAGE
-  value: maistra/istio-operator-centos7:0.10.0
+  value: maistra/istio-operator-ubi8:0.11.0
 - name: PULL_POLICY
   value: Always
 - name: NAMESPACE
@@ -17190,8 +17201,6 @@ objects:
   kind: CustomResourceDefinition
   metadata:
     name: controlplanes.istio.openshift.com
-    labels:
-      name: istio-operator
   spec:
     group: istio.openshift.com
     names:
@@ -17207,19 +17216,38 @@ objects:
 - apiVersion: apiextensions.k8s.io/v1beta1
   kind: CustomResourceDefinition
   metadata:
-    name: installations.istio.openshift.com
-    labels:
-      name: istio-operator
+    name: servicemeshcontrolplanes.maistra.io
   spec:
-    group: istio.openshift.com
+    group: maistra.io
     names:
-      kind: Installation
-      plural: installations
-      singular: installation
+      kind: ServiceMeshControlPlane
+      listKind: ServiceMeshControlPlaneList
+      plural: servicemeshcontrolplanes
+      singular: servicemeshcontrolplane
+      shortNames:
+       - smcp
     scope: Namespaced
     subresources:
       status: {}
-    version: v1alpha1
+    version: v1
+
+- apiVersion: apiextensions.k8s.io/v1beta1
+  kind: CustomResourceDefinition
+  metadata:
+    name: servicemeshmemberrolls.maistra.io
+  spec:
+    group: maistra.io
+    names:
+      kind: ServiceMeshMemberRoll
+      listKind: ServiceMeshMemberRollList
+      plural: servicemeshmemberrolls
+      singular: servicemeshmemberroll
+      shortNames:
+        - smmr
+    scope: Namespaced
+    subresources:
+      status: {}
+    version: v1
 
 - apiVersion: extensions/v1beta1
   kind: DaemonSet
@@ -17248,10 +17276,8 @@ objects:
 - apiVersion: apps/v1
   kind: Deployment
   metadata:
-    namespace: ${NAMESPACE}
     name: istio-operator
-    labels:
-      name: istio-operator
+    namespace: ${NAMESPACE}
   spec:
     replicas: 1
     selector:
@@ -17275,9 +17301,6 @@ objects:
             name: metrics
           command:
           - istio-operator
-          args:
-          - "--release=${RELEASE}"
-          - "--masterPublicURL=${MASTER_PUBLIC_URL}"
           - --discoveryCacheDir
           - /home/istio-operator/.kube/cache/discovery
           env:

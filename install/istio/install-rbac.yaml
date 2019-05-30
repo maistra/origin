@@ -22,7 +22,6 @@ objects:
     - serviceaccounts
     - namespaces
     - routes
-    - securitycontextconstraints
     verbs:
     - '*'
   - apiGroups:
@@ -122,11 +121,22 @@ objects:
     - get
     - create
   - apiGroups:
+    - maistra.io
+    resources:
+    - servicemeshcontrolplanes
+    - servicemeshcontrolplanes/status
+    - servicemeshcontrolplanes/finalizers
+    - servicemeshmemberrolls
+    - servicemeshmemberrolls/status
+    - servicemeshmemberrolls/finalizers
+    verbs:
+    - '*'
+  - apiGroups:
     - istio.openshift.com
     resources:
-    - '*'
-    - istiocontrolplanes
-    - installations
+    - controlplanes
+    - controlplanes/status
+    - controlplanes/finalizers
     verbs:
     - '*'
   - apiGroups:
@@ -185,7 +195,7 @@ objects:
     - deployments/finalizers
     resourceNames:
     - istio-galley
-    - istio-sidecar0injector
+    - istio-sidecar-injector
     verbs:
     - update
   # for mixer
@@ -265,6 +275,7 @@ objects:
     - namespaces
     - nodes
     - pods
+    - pods/log
     - services
     - replicationcontrollers
     verbs:
