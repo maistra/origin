@@ -22,7 +22,7 @@ import (
 
 const (
 	namespace = "istio-operator"
-	defaultImageFormat = "maistra/${component}-centos7:${version}"
+	defaultImageFormat = "maistra/${component}-ubi8:${version}"
 )
 
 var (
